@@ -63,9 +63,9 @@ void	addpath(t_list **env, char *path)
 	crsr = *env;
 	while (crsr)
 	{
-		if (!ft_strncmp("SHLVL=", crsr->content, -1))
+		if (!ft_strncmp("SHLVL=", crsr->content, ft_strlen("SHLVL=")))
 			lvlwas++;
-		if (!ft_strncmp("PATH=", crsr->content, -1))
+		if (!ft_strncmp("PATH=", crsr->content, ft_strlen("PATH=")))
 			pathwas++;
 		crsr = crsr->next;
 	}
@@ -86,6 +86,7 @@ void	readenv(t_list **env, char *path, char *envpath, int envfd)
 	while (ret)
 	{
 		ret[ft_strlen(ret) - 1] = '\0';
+		printf("ret: %s\n", ret);
 		if (!ft_strncmp(ret, "SHLVL=", ft_strlen("SHLVL=")))
 		{
 			buf = ft_itoa(ft_atoi(ret + ft_strlen("SHLVL=")) + 1);
@@ -168,13 +169,13 @@ int	main(int argc, char **argv)
 	while (1)
 	{
 		head.cmd = readline(prompt);
-		add_history(head.cmd);
 		if (!head.cmd)
 			ft_putstr_fd("exit\n", 1);
 		if (!head.cmd)
 			break ;
 		if (!*head.cmd)
 			continue ;
+		add_history(head.cmd);
 		if (!startvalidation(&head))
 		{
 			handlecmd(&head, &stat_loc);

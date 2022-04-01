@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   export.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lyubov <lyubov@student.42.fr>              +#+  +:+       +#+        */
+/*   By: dcelsa <dcelsa@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/08 17:00:11 by gajayme           #+#    #+#             */
-/*   Updated: 2022/03/31 18:58:39 by lyubov           ###   ########.fr       */
+/*   Updated: 2022/04/01 20:46:01 by dcelsa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,6 +55,9 @@ void	distributor(char **av, char **env)
 			if (!env_cmp(env[i], av[j], av[0]))
 			{
 				printf("%s\n", av[j]);
+				ft_putstr_fd("v exporte: ", 2);
+				ft_putstr_fd(av[j], 2);
+				ft_putstr_fd("\n", 2);
 				av_remove(av, j);
 				flag = 1;
 			}

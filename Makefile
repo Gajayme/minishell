@@ -18,6 +18,8 @@ PIPPATH		=	pipex/
 
 LIB			=	$(addprefix $(LIBPATH), $(LIBNAME))
 
+BLTIN		=	builtins
+
 GNL			=	GetNextLine
 
 NAME		=	minishell
@@ -33,8 +35,12 @@ READLINE_EBANIY	= -lreadline -L ~/.brew/opt/readline/lib -I~/.brew/opt/readline/
 
 $(NAME):	$(HEADS) $(LIB) $(OBJS)
 			$(GCC) $(OBJS) $(LIB) -o $(NAME) $(READLINE_EBANIY)
+			
 
-all:		$(NAME)
+bltins:		
+			$(MAKE) -C $(BLTIN)
+
+all:		bltins $(NAME)
 
 $(LIB):		lib
 
@@ -46,6 +52,7 @@ bonus:		clean $(HEADS) $(B_OBJS) $(LIB)
 
 clean:
 			@$(MAKE) -C $(LIBPATH) clean
+			$(MAKE) -C $(BLTIN) clean
 			$(RM) $(wildcard *.d)
 			$(RM) ${wildcard GetNextLine/*.d}
 			$(RM) $(OBJS)
@@ -53,6 +60,7 @@ clean:
 
 fclean: 	clean
 			@$(MAKE) -C $(LIBPATH) fclean
+			$(MAKE) -C $(BLTIN) fclean
 			$(RM) $(NAME)
 			$(RM) $(B_NAME)
 
