@@ -19,8 +19,6 @@ EXIT		=	funcs/exit
 
 LIBPATH		=	libft/
 
-PIPPATH		=	pipex/
-
 LIB			=	$(addprefix $(LIBPATH), $(LIBNAME))
 
 BLTIN		=	builtins
@@ -29,17 +27,19 @@ GNL			=	GetNextLine
 
 NAME		=	minishell
 
-GCC			=	gcc -g -MMD
+GCC			=	gcc -g -MMD -Wall -Wextra -Werror
 
 RM			=	rm -f
 
-READLINE_EBANIY	= -lreadline -L ~/.brew/opt/readline/lib -I~/.brew/opt/readline/include
+READCLUDE	= -I~/.brew/opt/readline/include
+
+READLINE	= -lreadline -L ~/.brew/opt/readline/lib $(READCLUDE)
 
 %.o: 		%.c
-			$(GCC) -c -I$(LIBPATH) -I$(GNL) -I$(CD) -I$(EXIT) -I~/.brew/opt/readline/include $< -o $@
+			$(GCC) -c -I$(LIBPATH) -I$(GNL) -I$(CD) -I$(EXIT) $(READCLUDE) $< -o $@
 
 $(NAME):	$(HEADS) $(LIB) $(OBJS) $(BLTIN)
-			$(GCC) $(OBJS) $(LIB) -o $(NAME) $(READLINE_EBANIY)
+			$(GCC) $(OBJS) $(LIB) -o $(NAME) $(READLINE)
 			
 
 $(BLTIN):	bltin

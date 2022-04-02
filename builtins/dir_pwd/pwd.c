@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   pwd.c                                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lyubov <lyubov@student.42.fr>              +#+  +:+       +#+        */
+/*   By: dcelsa <dcelsa@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/07 23:17:24 by lyubov            #+#    #+#             */
-/*   Updated: 2022/03/31 18:58:51 by lyubov           ###   ########.fr       */
+/*   Updated: 2022/04/02 21:28:46 by dcelsa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,7 @@ int	main(int ac, char **av)
 {
 	char	dir[PATH_MAX + 1];
 
-	if (ac != 1)
+	if (ac != 2)
 	{
 		up_putstr_fd(av[0], 2);
 		up_putstr_fd(": pwd: too many arguments\n", 2);

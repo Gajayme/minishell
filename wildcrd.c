@@ -6,7 +6,7 @@
 /*   By: dcelsa <dcelsa@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/02 15:52:38 by dcelsa            #+#    #+#             */
-/*   Updated: 2022/04/02 15:52:43 by dcelsa           ###   ########.fr       */
+/*   Updated: 2022/04/03 00:55:17 by dcelsa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -99,7 +99,7 @@ static char	*filedef(t_bounds *word, char *cwd, t_list *qtxt)
 	entries = NULL;
 	dir = opendir(cwd);
 	free(cwd);
-	ret = NULL + 1;
+	ret = (struct dirent *)cwd;
 	while (ret)
 	{
 		ret = readdir(dir);

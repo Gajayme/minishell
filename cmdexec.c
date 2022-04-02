@@ -6,7 +6,7 @@
 /*   By: dcelsa <dcelsa@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/02 16:01:52 by dcelsa            #+#    #+#             */
-/*   Updated: 2022/04/02 20:10:49 by dcelsa           ###   ########.fr       */
+/*   Updated: 2022/04/03 01:03:55 by dcelsa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,16 +19,14 @@ static int	grand_finale(int pidcount, pid_t *pids, t_head *head, t_list *args)
 
 	i = -1;
 	while (++i < pidcount)
-		error_handler(head->prog, NULL, waitpid(pids[i], NULL, WUNTRACED));
+		error_handler(head->prog, NULL, waitpid(pids[i], &stat_lock, WUNTRACED));
 	free(pids);
 	if (pidcount > 1)
-		return (WEXITSTATUS(stat_lock));
-	if (!ft_strncmp(argcast(args)->arg, "exit", -1) && !stat_lock)
-		ft_putstr_fd("1", head->fds.ex[1]);
-	if (!ft_strncmp(argcast(args)->arg, "exit", -1) && !stat_lock)
-		ft_exit(head->prog, cmdarr(args->next, TRUE));
+		return (stat_lock);
+	if (head->fds.envfds)
+		readenv(&head->env, head->path, ft_strjoin(":", head->path), ((int *)ft_lstlast(head->fds.envfds)->content)[0]);
 	if (ft_strncmp(argcast(args)->arg, "cd", -1) || stat_lock)
-		return (WEXITSTATUS(stat_lock));
+		return (stat_lock);
 	if (ft_lstsize(args) > 1)
 	{
 		ft_putstr_fd(argcast(args->next)->arg, head->fds.path[1]);
@@ -37,15 +35,15 @@ static int	grand_finale(int pidcount, pid_t *pids, t_head *head, t_list *args)
 	}
 	ft_putstr_fd(findenv("HOME", ft_strlen("HOME"), head, FALSE), head->fds.path[1]);
 	cd(head->prog, NULL, &head->env);
-	return (WEXITSTATUS(stat_lock));
+	return (stat_lock);
 }
 
-t_bool	skippedcmd(int referr, t_list **crsr)
+t_bool	skippedcmd(int referr, t_list **crsr, t_list *cmdlst)
 {
 	char	ref;
 
 	ref = '&' * (!!referr) + '|' * (!referr);
-	if (!(*crsr) || cmdcast(*crsr)->lprior != ref)
+	if (!(*crsr) || cmdcast(*crsr)->lprior != ref || *crsr == cmdlst)
 		return (FALSE);
 	while (*crsr
 		&& (cmdcast(*crsr)->lprior == ref || cmdcast(*crsr)->ispipe))
@@ -53,13 +51,13 @@ t_bool	skippedcmd(int referr, t_list **crsr)
 	return (TRUE);
 }
 
-static int	pipehndlr(t_head *head, t_list **crsr)
+static int	pipehndlr(t_head *head, t_list **crsr, t_list *cmdlst)
 {
 	pid_t	*pids;
 	int		pipecmds;
 	int		nullfd[2];
 
-	if (skippedcmd(head->referr, crsr))
+	if (skippedcmd(head->referr, crsr, cmdlst))
 		return (head->referr);
 	pipecmds = 0;
 	head->pipe = NULL;
@@ -78,23 +76,17 @@ static int	pipehndlr(t_head *head, t_list **crsr)
 	return (head->referr);
 }
 
-void	rewriteenv(t_list **envfds, t_fds *fds)
+void	rewriteenv(t_list *env, t_fds *fds)
 {
-	char	*buf;
-
 	close(fds->path[1]);
 	close(fds->ex[1]);
-	if (!envfds && !close(fds->env[1]))
-		return ;
-	buf = get_next_line(((int *)ft_lstlast(*envfds)->content)[0]);
-	while (buf)
+	while (env)
 	{
-		ft_putstr_fd(buf, fds->env[1]);
-		free(buf);
-		buf = get_next_line(((int *)ft_lstlast(*envfds)->content)[0]);
+		ft_putstr_fd(env->content, fds->env[1]);
+		ft_putstr_fd("\n", fds->env[1]);
+		env = env->next;
 	}
 	close(fds->env[1]);
-	ft_lstclear(envfds, &free);
 }
 
 void	handlecmd(t_head *head, int *stat_loc)
@@ -103,8 +95,9 @@ void	handlecmd(t_head *head, int *stat_loc)
 	t_list	*cmdlst;
 	t_list	*crsr;
 
-	if (!pipe(head->fds.path) && !pipe(head->fds.env) && !pipe(head->fds.ex))
-		pid = fork();
+	if (!pipe(head->fds.path) && !pipe(head->fds.env))
+		pipe(head->fds.ex);
+	pid = fork();
 	if (pid && !close(head->fds.env[1]) && !close(head->fds.path[1])
 		&& !close(head->fds.ex[1]) && waitpid(pid, stat_loc, WUNTRACED))
 		return ;
@@ -112,12 +105,12 @@ void	handlecmd(t_head *head, int *stat_loc)
 		&& !close(head->fds.ex[0]))
 		cmdlst = NULL;
 	parser(head, &cmdlst);
-	head->referr = 0;
 	head->fds.envfds = NULL;
 	crsr = cmdlst;
 	while (crsr)
-		head->referr = pipehndlr(head, &crsr);
-	rewriteenv(&head->fds.envfds, &head->fds);
+		head->referr = pipehndlr(head, &crsr, cmdlst);
+	rewriteenv(head->env, &head->fds);
+	ft_lstclear(&head->fds.envfds, &free);
 	ft_lstclear(&cmdlst, &clearcmdlst);
 	exit(head->referr);
 }

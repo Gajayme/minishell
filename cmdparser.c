@@ -6,7 +6,7 @@
 /*   By: dcelsa <dcelsa@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/02 15:59:47 by dcelsa            #+#    #+#             */
-/*   Updated: 2022/04/02 15:59:50 by dcelsa           ###   ########.fr       */
+/*   Updated: 2022/04/02 23:56:08 by dcelsa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,7 +38,7 @@ static void	redirdefiner(t_bounds *cmd, t_list **redirs, t_list *qtxt)
 	redirdefiner(&rdr, redirs, qtxt);
 }
 
-static void	cmdbuilder(t_bounds *cmd, t_head *head, t_cmd *curcmd, t_list *qtxt)
+static void	cmdbuilder(t_bounds *cmd, t_cmd *curcmd, t_list *qtxt)
 {
 	t_bounds	word;
 	t_bool		wastoken;
@@ -67,8 +67,6 @@ static void	cmdbuilder(t_bounds *cmd, t_head *head, t_cmd *curcmd, t_list *qtxt)
 
 static void	priordefiner(t_cmd *curcmd, t_bounds *cmd, char *cmds)
 {
-	char	*crsr;
-
 	curcmd->ispipe = (*cmd->end == '|' && *(cmd->end + 1) != '|');
 	curcmd->lprior = '\0';
 	if (cmd->begin == cmds)
@@ -95,7 +93,7 @@ void	parser(t_head *head, t_list **cmdlst)
 		curcmd->ispipe = FALSE;
 		priordefiner(curcmd, &cmd, head->cmd);
 		curcmd->redirs = NULL;
-		cmdbuilder(&cmd, head, curcmd, qtxt);
+		cmdbuilder(&cmd, curcmd, qtxt);
 		ft_lstadd_back(cmdlst, ft_lstnew(curcmd));
 		cmd.begin = cmd.end + (*cmd.end == *(cmd.end + 1));
 	}

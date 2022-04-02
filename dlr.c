@@ -6,7 +6,7 @@
 /*   By: dcelsa <dcelsa@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/02 15:30:47 by dcelsa            #+#    #+#             */
-/*   Updated: 2022/04/02 15:30:52 by dcelsa           ###   ########.fr       */
+/*   Updated: 2022/04/03 01:21:52 by dcelsa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,7 +68,13 @@ char	*findenv(char *name, int size, t_head *head, t_bool quoted)
 	t_list	*crsr;
 
 	if (*name == '?')
-		return (ft_itoa(head->referr));
+	{
+		printf("err: %d %d %d\n", head->referr, WIFSIGNALED(head->referr), WIFEXITED(head->referr));
+		if (WIFSIGNALED(head->referr))
+			return (ft_itoa(128 + WTERMSIG(head->referr)));
+		if (WIFEXITED(head->referr))
+			return (ft_itoa(WEXITSTATUS(head->referr)));
+	}
 	crsr = head->env;
 	while (crsr)
 	{
@@ -89,18 +95,17 @@ char	*dlrhndlr(char *begin, t_head *head, t_list **exps, t_list *qtxt)
 
 	word.begin = begin;
 	word.end = word.begin + ft_strlen(word.begin);
-	word.end = symbdefiner(&word, "'\" *<>&|()$?", qtxt);
-	if (word.end == word.begin
+	word.end = symbdefiner(&word, "'\" *<>&|$?", qtxt);
+	if (word.end == word.begin || (!head->isredir && *word.end == '?')
 		|| (istoken(word.end, " $") && word.end - 1 == word.begin))
 		return (word.end);
 	ft_lstadd_back(exps, ft_lstnew(malloc(sizeof(t_exp))));
 	expcast(ft_lstlast(*exps))->sns.begin = word.begin;
-	expcast(ft_lstlast(*exps))->sns.end = word.end;
+	expcast(ft_lstlast(*exps))->sns.end = word.end + !istoken(word.end, "'\" *<>&|$");
 	word.begin++;
-	word.end -= istoken(word.end, "'\" *<>&|()$") + (!*word.end);
+	word.end -= istoken(word.end, "'\" *<>&|$") + (!*word.end);
 	(expcast(ft_lstlast(*exps))->val) = findenv(word.begin,
 			word.end - word.begin + 1, head,
 			!outqt(word.begin - 1, qtxt, TRUE));
-	return (word.end + istoken(word.end + 1,
-			"'\" *<>&|()$") + (!*(word.end + 1)));
+	return (expcast(ft_lstlast(*exps))->sns.end);
 }

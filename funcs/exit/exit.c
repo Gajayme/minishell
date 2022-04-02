@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   exit.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lyubov <lyubov@student.42.fr>              +#+  +:+       +#+        */
+/*   By: dcelsa <dcelsa@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/21 19:42:30 by gajayme           #+#    #+#             */
-/*   Updated: 2022/03/31 20:09:00 by lyubov           ###   ########.fr       */
+/*   Updated: 2022/04/03 00:52:35 by dcelsa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,6 @@ int	digit_checker(char *arg, char *shell_name)
 
 int	overflow_checker(char *arg, char *shell_name)
 {
-	int				i;
 	unsigned long	max;
 	unsigned long	num;
 

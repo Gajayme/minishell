@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   cd_utils.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lyubov <lyubov@student.42.fr>              +#+  +:+       +#+        */
+/*   By: dcelsa <dcelsa@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/23 10:49:05 by lyubov            #+#    #+#             */
-/*   Updated: 2022/03/31 20:34:26 by lyubov           ###   ########.fr       */
+/*   Updated: 2022/04/03 00:52:13 by dcelsa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,8 +14,6 @@
 
 int	pprrr(char *shell_name, char *dirname)
 {
-	char	*str;
-
 	ft_putstr_fd(shell_name, 2);
 	ft_putstr_fd(": cd: ", 2);
 	perror(dirname);

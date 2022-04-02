@@ -6,7 +6,7 @@
 /*   By: dcelsa <dcelsa@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/02 16:06:31 by dcelsa            #+#    #+#             */
-/*   Updated: 2022/04/02 16:06:32 by dcelsa           ###   ########.fr       */
+/*   Updated: 2022/04/03 00:28:06 by dcelsa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,7 +43,8 @@ static void	dlrvalidator(char *cmds, char *prog, t_list *qtxt)
 		bounds.begin = symbdefiner(&bounds, "$", qtxt);
 	while (bounds.begin < bounds.end)
 	{
-		if (!ft_isalpha(*(++bounds.begin)) && !istoken(bounds.begin, " '\"?"))
+		if (!ft_isalpha(*(++bounds.begin)) && !istoken(bounds.begin, " '\"?")
+			&& *bounds.begin)
 			parserr(prog, bounds.begin);
 		bounds.begin = symbdefiner(&bounds, "$", qtxt);
 	}
@@ -59,6 +60,8 @@ static void	checkbounds(t_bounds *crsr, char *prog)
 		|| (*crsr->end == '|' && *(crsr->end + 1) == '&'))
 		parserr(prog, crsr->end);
 	cursor = crsr->begin + 1;
+	if (!istoken(crsr->begin, "&|<>") && !*cursor)
+		return ;
 	while (cursor < crsr->end && *cursor == ' ')
 		cursor++;
 	if (cursor < crsr->end)
@@ -76,6 +79,8 @@ int	strvalidator(char *prog, char *cmds)
 	pid = fork();
 	if (pid && waitpid(pid, &stat_loc, WUNTRACED))
 		return (stat_loc);
+	while (*cmds == ' ')
+		cmds++;
 	qtxt = NULL;
 	quotedtxt(cmds, prog, &qtxt, TRUE);
 	dlrvalidator(cmds, prog, qtxt);

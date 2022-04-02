@@ -6,7 +6,7 @@
 /*   By: dcelsa <dcelsa@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/02 15:54:16 by dcelsa            #+#    #+#             */
-/*   Updated: 2022/04/02 15:54:20 by dcelsa           ###   ########.fr       */
+/*   Updated: 2022/04/03 01:29:09 by dcelsa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,7 +74,7 @@ static char	*newcmdbuilder(char *cmd, t_list *crsr, t_list *exps)
 			+ ft_strlen(expcast(crsr)->val);
 		crsr = crsr->next;
 	}
-	new = malloc(sizeof(*new) * size);
+	new = ft_bzero(malloc(sizeof(*new) * size), size);
 	crs = new;
 	while (exps)
 	{
@@ -86,6 +86,10 @@ static char	*newcmdbuilder(char *cmd, t_list *crsr, t_list *exps)
 		ft_strlcat(crs, expcast(exps)->val, ft_strlen(expcast(exps)->val) + 1);
 		exps = exps->next;
 	}
+	if (*cmd)
+		crs += ft_strlen(crs);
+	if (*cmd)
+		ft_strlcat(crs, cmd, ft_strlen(cmd) + 1);
 	return (new);
 }
 
@@ -105,6 +109,7 @@ void	expandspecialsigns(t_head *head, t_list **qtxt)
 		head->cmd = cmd;
 	}
 	ft_lstclear(&expansions, &clearexp);
+	ft_lstclear(qtxt, &free);
 	*qtxt = NULL;
 	quotedtxt(head->cmd, head->prog, qtxt, FALSE);
 	wildcardhndlr(head->cmd, head, &expansions, *qtxt);

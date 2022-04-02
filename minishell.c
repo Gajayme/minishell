@@ -6,7 +6,7 @@
 /*   By: dcelsa <dcelsa@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/02 16:35:07 by dcelsa            #+#    #+#             */
-/*   Updated: 2022/04/02 20:05:14 by dcelsa           ###   ########.fr       */
+/*   Updated: 2022/04/03 00:29:29 by dcelsa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,10 +69,10 @@ void	handleexeptions(t_fds *fds, t_list **env, char *path, char *prog)
 int	main(int argc, char **argv)
 {
 	t_head	head;
-	int		stat_loc;
 	char	*prompt;
 
-	prompt = shellinit(&head.path, &head.prog, *argv, &head.env);
+	(void)argc;
+	prompt = shellinit(&head, *argv);
 	while (1)
 	{
 		head.cmd = readline(prompt);
@@ -80,17 +80,14 @@ int	main(int argc, char **argv)
 			ft_putstr_fd("exit\n", 1);
 		if (!head.cmd)
 			break ;
-		if (!*head.cmd)
-			continue ;
-		add_history(head.cmd);
+		if (*head.cmd)
+			add_history(head.cmd);
 		if (!strvalidator(head.prog, head.cmd))
 		{
-			handlecmd(&head, &stat_loc);
+			handlecmd(&head, &head.referr);
 			handleexeptions(&head.fds, &head.env, head.path, head.prog);
 		}
 		free(head.cmd);
 	}
-	clear_history();
-	free(prompt);
-	return (0);
+	exit(0);
 }

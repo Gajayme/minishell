@@ -6,7 +6,7 @@
 /*   By: dcelsa <dcelsa@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/02 16:02:07 by dcelsa            #+#    #+#             */
-/*   Updated: 2022/04/02 19:43:56 by dcelsa           ###   ########.fr       */
+/*   Updated: 2022/04/02 22:09:35 by dcelsa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,7 +70,7 @@ static t_bool	addprogname(char *cmd, char *prog, t_list **args,
 	return (TRUE);
 }
 
-void	builtinhndlr(t_cmd *cmd, t_list *env, t_head *head, t_bool *isbuiltin)
+void	builtinhndlr(t_cmd *cmd, t_head *head, t_bool *isbuiltin)
 {
 	if (!ft_strncmp(argcast(cmd->args)->arg, "exit", -1))
 		ft_exit(head->prog, cmdarr(cmd->args, TRUE));

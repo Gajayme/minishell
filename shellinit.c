@@ -6,7 +6,7 @@
 /*   By: dcelsa <dcelsa@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/02 16:34:31 by dcelsa            #+#    #+#             */
-/*   Updated: 2022/04/02 20:17:05 by dcelsa           ###   ########.fr       */
+/*   Updated: 2022/04/03 00:29:46 by dcelsa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,9 +14,10 @@
 
 static void	ctrlc_handler(int signum)
 {
+	(void)signum;
 	ft_putstr_fd("\n", 1);
-	rl_replace_line("", 0);
 	rl_on_new_line();
+	rl_replace_line("", 0);
 	rl_redisplay();
 }
 
@@ -44,7 +45,7 @@ static void	rememberpath(char **path, char *argv)
 	free(curdir);
 }
 
-static void	increaselvl(t_list **env, char *path)
+static void	increaselvl(t_list **env)
 {
 	t_list	*crsr;
 	char	*buf;
@@ -66,7 +67,7 @@ static void	increaselvl(t_list **env, char *path)
 	ft_lstadd_back(env, ft_lstnew(ft_strdup("SHLVL=1")));
 }
 
-char	*shellinit(char **path, char **prog, char *argv, t_list **env)
+char	*shellinit(t_head *head, char *argv)
 {
 	struct termios	p;
 	int				pfd[2];
@@ -83,13 +84,13 @@ char	*shellinit(char **path, char **prog, char *argv, t_list **env)
 		ft_putstr_fd("\n", pfd[1]);
 	}
 	close(pfd[1]);
-	rememberpath(path, argv);
-	*env = NULL;
-	readenv(env, *path, ft_strjoin(":", *path), pfd[0]);
-	increaselvl(env, *path);
+	rememberpath(&head->path, argv);
+	head->env = NULL;
+	readenv(&head->env, head->path, ft_strjoin(":", head->path), pfd[0]);
+	increaselvl(&head->env);
 	close(pfd[0]);
-	*prog = argv;
+	head->prog = argv;
 	if (ft_strrchr(argv, '/'))
-		*prog = ft_strrchr(argv, '/') + 1;
-	return (ft_strjoin(*prog, "> "));
+		head->prog = ft_strrchr(argv, '/') + 1;
+	return (ft_strjoin(head->prog, "> "));
 }

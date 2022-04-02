@@ -6,7 +6,7 @@
 /*   By: dcelsa <dcelsa@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/04 19:57:04 by dcelsa            #+#    #+#             */
-/*   Updated: 2022/04/02 20:08:18 by dcelsa           ###   ########.fr       */
+/*   Updated: 2022/04/03 01:37:14 by dcelsa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,12 +75,31 @@ static t_bool	closefds(t_fds *fds, int leftpfd[2])
 	return (TRUE);
 }
 
-void	envhndlr(char *cmd, t_list **envfds)
+void	envhndlr(t_list *args, t_head *head)
 {
-	if (ft_strncmp(cmd, "export", -1) && ft_strncmp(cmd, "unset", -1))
-		return ;
-	ft_lstadd_back(envfds, ft_lstnew(malloc(sizeof(int) * 2)));
-	pipe(ft_lstlast(*envfds)->content);
+	t_list	*qtxt;
+	char	*buf;
+
+	if (ft_strncmp(argcast(args)->arg, "export", -1)
+		&& ft_strncmp(argcast(args)->arg, "unset", -1))
+	{
+		ft_lstadd_back(&head->fds.envfds, ft_lstnew(malloc(sizeof(int) * 2)));
+		pipe(ft_lstlast(head->fds.envfds)->content);
+	}
+	while (args)
+	{
+		if (!ft_strchr(argcast(args)->arg, '$'))
+		{
+			buf = head->cmd;
+			head->cmd = argcast(args)->arg;
+			head->isredir = TRUE;
+			expandspecialsigns(head, &qtxt);
+			head->isredir = FALSE;
+			argcast(args)->arg = head->cmd;
+			head->cmd = buf;
+		}
+		args = args->next;
+	}
 }
 
 int	forker(t_list *curcmd, t_head *head, int rightpfd[2], pid_t *pidsfd)
@@ -95,7 +114,7 @@ int	forker(t_list *curcmd, t_head *head, int rightpfd[2], pid_t *pidsfd)
 	if (getprevstruct(head->pipe, curcmd))
 		forker(getprevstruct(head->pipe, curcmd), head, leftpfd, pidsfd);
 	strindx = structindex(head->pipe, curcmd);
-	envhndlr(argcast(cmdcast(curcmd)->args)->arg, &head->fds.envfds);
+	envhndlr(cmdcast(curcmd)->args, &head);
 	pidsfd[strindx] = error_handler(head->prog, NULL, fork());
 	if (pidsfd[strindx] && closefds(&head->fds, leftpfd))
 		return (0);
@@ -103,7 +122,7 @@ int	forker(t_list *curcmd, t_head *head, int rightpfd[2], pid_t *pidsfd)
 	if (head->fds.envfds)
 		close(((int *)ft_lstlast(head->fds.envfds)->content)[0]);
 	rdrhndlr(cmdcast(curcmd), &head->fds, head);
-	builtinhndlr(cmdcast(curcmd), head->env, head, &isbuiltin);
+	builtinhndlr(cmdcast(curcmd), head, &isbuiltin);
 	mounter(leftpfd, rightpfd, cmdcast(curcmd)->fd, head->prog);
 	return (executor(cmdcast(curcmd), cmdarr(head->env, FALSE), head->prog,
 			isbuiltin));

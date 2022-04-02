@@ -6,7 +6,7 @@
 /*   By: dcelsa <dcelsa@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/07 21:03:40 by lyubov            #+#    #+#             */
-/*   Updated: 2022/04/02 20:23:34 by dcelsa           ###   ########.fr       */
+/*   Updated: 2022/04/02 20:25:30 by dcelsa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@ int	cd(char *shell_name, char *dirname, t_list **list)
 	flag = 0;
 	if (!list)
 	{
-		if (chdir(dirname && pprrr(shell_name, dirname)))
+		if (chdir(dirname) && pprrr(shell_name, dirname))
 			return (1);
 		return (0);
 	}

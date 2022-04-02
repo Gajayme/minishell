@@ -6,7 +6,7 @@
 /*   By: dcelsa <dcelsa@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/04 21:08:37 by dcelsa            #+#    #+#             */
-/*   Updated: 2022/04/02 20:09:26 by dcelsa           ###   ########.fr       */
+/*   Updated: 2022/04/03 00:55:32 by dcelsa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,8 +53,11 @@
 extern int		errno;
 extern char		**environ;
 
+extern void		rl_replace_line(const char *, int);
+
 typedef int				t_bool;
 typedef unsigned int	t_ui;
+
 
 typedef struct s_dir {
 	char			*cwd;
@@ -121,7 +124,7 @@ int			access_checker(char *path);
 int			arrsize(char **argv);
 t_arg		*argcast(t_list *lst);
 t_bounds	*boundcast(t_list *lst);
-void		builtinhndlr(t_cmd *cmd, t_list *env, t_head *head, t_bool *isbuiltin);
+void		builtinhndlr(t_cmd *cmd, t_head *head, t_bool *isbuiltin);
 void		clearcmdlst(void *content);
 void		clearexp(void *content);
 void		clearredirlst(void *content);
@@ -148,7 +151,7 @@ t_bool		rediravoider(char *crsr, char *cmd, t_bool forwld);
 void		redirerr(char *prog, char *place);
 t_redir		*rdrcast(t_list *lst);
 void		rdrhndlr(t_cmd	*cmd, t_fds *fds, t_head *head);
-char		*shellinit(char **path, char **prog, char *argv, t_list **env);
+char		*shellinit(t_head *head, char *argv);
 char		*slash(char *end, char *home);
 int			strvalidator(char *prog, char *cmds);
 int			structindex(t_list *begin, t_list *curcmd);
