@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   wildcrd.c                                          :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: dcelsa <dcelsa@student.42.fr>              +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2022/04/02 15:52:38 by dcelsa            #+#    #+#             */
+/*   Updated: 2022/04/02 15:52:43 by dcelsa           ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "minishell.h"
 
 static t_bool	filematcher(char *entry, t_list *part, t_list *parts)
@@ -13,17 +25,17 @@ static t_bool	filematcher(char *entry, t_list *part, t_list *parts)
 		return (FALSE);
 	if (part != parts)
 		return (filematcher(ft_strnstr(entry, part->content, -1)
-			+ ft_strlen(part->content), part->next, parts));
+				+ ft_strlen(part->content), part->next, parts));
 	if (part->content && ft_strncmp(part->content, entry,
 			ft_strlen(part->content)))
 		return (FALSE);
 	if (!filematcher(entry + ft_strlen(part->content),
-		part->next, parts))
+			part->next, parts))
 		return (FALSE);
 	return (TRUE);
 }
 
-static char *compileentries(t_list **entries, int size)
+static char	*compileentries(t_list **entries, int size)
 {
 	t_list	*crsr;
 	char	*line;
@@ -49,31 +61,7 @@ static char *compileentries(t_list **entries, int size)
 	return (line);
 }
 
-static char *filedef(t_bounds *word, t_list *parts, char *cwd)
-{
-	struct dirent	*ret;
-	t_list			*entries;
-	DIR				*dir;
-	
-	entries = NULL;
-	dir = opendir(cwd);
-	free(cwd);
-	ret = NULL + 1;
-	while (ret)
-	{
-		ret = readdir(dir);
-		if (!ret || *ret->d_name == '.'
-			|| ((*word->end == '/' && ret->d_type != DT_DIR)
-			|| !filematcher(ret->d_name, parts, parts)))
-			continue ;
-		ft_lstadd_back(&entries, ft_lstnew(slash(word->end,
-											ft_strdup(ret->d_name))));
-	}
-	closedir(dir);
-	return (compileentries(&entries, 0));
-}
-
-static void partbuilder(t_bounds *word, t_list **parts, t_head *head, t_list *qtxt)
+static void	partbuilder(t_bounds *word, t_list **parts, t_list *qtxt)
 {
 	t_bounds	bounds;
 
@@ -89,19 +77,46 @@ static void partbuilder(t_bounds *word, t_list **parts, t_head *head, t_list *qt
 		bounds.end = bounds.begin;
 	while (*bounds.end == '*')
 		bounds.end++;
-	if ((!*bounds.end || istoken(bounds.end, " <>&|")) && *(bounds.end - 1) == '*')
+	if ((!*bounds.end || istoken(bounds.end, " <>&|"))
+		&& *(bounds.end - 1) == '*')
 		ft_lstadd_back(parts, ft_lstnew(NULL));
 	if (!*bounds.end || istoken(bounds.end, " <>&|"))
 		return ;
 	bounds.begin = bounds.end;
 	bounds.end = word->end;
-	partbuilder(&bounds, parts, head, qtxt);
+	partbuilder(&bounds, parts, qtxt);
+}
+
+static char	*filedef(t_bounds *word, char *cwd, t_list *qtxt)
+{
+	struct dirent	*ret;
+	t_list			*entries;
+	DIR				*dir;
+	t_list			*parts;
+
+	parts = NULL;
+	partbuilder(word, &parts, qtxt);
+	entries = NULL;
+	dir = opendir(cwd);
+	free(cwd);
+	ret = NULL + 1;
+	while (ret)
+	{
+		ret = readdir(dir);
+		if (!ret || *ret->d_name == '.'
+			|| ((*word->end == '/' && ret->d_type != DT_DIR)
+				|| !filematcher(ret->d_name, parts, parts)))
+			continue ;
+		ft_lstadd_back(&entries, ft_lstnew(slash(word->end,
+					ft_strdup(ret->d_name))));
+	}
+	closedir(dir);
+	ft_lstclear(&parts, &free);
+	return (compileentries(&entries, 0));
 }
 
 void	wildcardhndlr(char *crsr, t_head *head, t_list **exps, t_list *qtxt)
 {
-	t_list		*parts;
-	t_list		*entries;
 	t_bounds	cmd;
 
 	cmd.begin = crsr;
@@ -117,15 +132,12 @@ void	wildcardhndlr(char *crsr, t_head *head, t_list **exps, t_list *qtxt)
 		wildcardhndlr(cmd.end, head, exps, qtxt);
 	if (rediravoider(cmd.begin, head->cmd, TRUE))
 		return ;
-	parts = NULL;
-	partbuilder(&cmd, &parts, head, qtxt);
 	ft_lstadd_back(exps, ft_lstnew(malloc(sizeof(t_exp))));
 	cmd.end -= !*cmd.end;
-	expcast(ft_lstlast(*exps))->val = filedef(&cmd, parts, getcwd(NULL, 0));
+	(expcast(ft_lstlast(*exps))->val) = filedef(&cmd, getcwd(NULL, 0), qtxt);
 	expcast(ft_lstlast(*exps))->sns.begin = cmd.begin;
 	expcast(ft_lstlast(*exps))->sns.end = ++cmd.end;
 	if (!expcast(ft_lstlast(*exps))->val)
 		expcast(ft_lstlast(*exps))->sns.end = cmd.begin;
-	ft_lstclear(&parts, &free);
 	wildcardhndlr(cmd.end, head, exps, qtxt);
 }

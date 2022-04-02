@@ -1,31 +1,38 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   cd.c                                               :+:      :+:    :+:   */
+/*   casting.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: dcelsa <dcelsa@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/03/07 21:03:40 by lyubov            #+#    #+#             */
-/*   Updated: 2022/04/02 16:21:02 by dcelsa           ###   ########.fr       */
+/*   Created: 2022/04/02 15:53:01 by dcelsa            #+#    #+#             */
+/*   Updated: 2022/04/02 15:53:02 by dcelsa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "cd.h"
+#include "minishell.h"
 
-int	cd(char *shell_name, char *dirname, t_list **list)
+t_bounds	*boundcast(t_list *lst)
 {
-	int	flag;
+	return (lst->content);
+}
 
-	flag = 0;
-	if (!dirname)
-	{
-		if (find_home(shell_name, *list, &dirname))
-			return (1);
-		flag = 1;
-	}
-	if (dir_changer(dirname, list) && pprrr(shell_name, dirname))
-		return (1);
-	if (flag)
-		free(dirname);
-	return (0);
+t_cmd	*cmdcast(t_list *lst)
+{
+	return (lst->content);
+}
+
+t_redir	*rdrcast(t_list *lst)
+{
+	return (lst->content);
+}
+
+t_arg	*argcast(t_list *lst)
+{
+	return (lst->content);
+}
+
+t_exp	*expcast(t_list *lst)
+{
+	return (lst->content);
 }

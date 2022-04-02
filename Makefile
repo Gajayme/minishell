@@ -1,5 +1,6 @@
 SRCS		=	${wildcard *.c}				\
 				${wildcard GetNextLine/*.c}	\
+				${wildcard funcs/*/*.c}		\
 
 B_SRCS		=	${wildcard *_bonus.c}		\
 				${wildcard GetNextLine/*.c}	\
@@ -11,6 +12,10 @@ B_OBJS		=	$(B_SRCS:.c=.o)
 HEADS		=	minishell.h
 
 LIBNAME		=	libft.a
+
+CD			=	funcs/cd
+
+EXIT		=	funcs/exit
 
 LIBPATH		=	libft/
 
@@ -31,16 +36,18 @@ RM			=	rm -f
 READLINE_EBANIY	= -lreadline -L ~/.brew/opt/readline/lib -I~/.brew/opt/readline/include
 
 %.o: 		%.c
-			$(GCC) -c -I$(LIBPATH) -I$(GNL) -I~/.brew/opt/readline/include $< -o $@
+			$(GCC) -c -I$(LIBPATH) -I$(GNL) -I$(CD) -I$(EXIT) -I~/.brew/opt/readline/include $< -o $@
 
-$(NAME):	$(HEADS) $(LIB) $(OBJS)
+$(NAME):	$(HEADS) $(LIB) $(OBJS) $(BLTIN)
 			$(GCC) $(OBJS) $(LIB) -o $(NAME) $(READLINE_EBANIY)
 			
 
-bltins:		
+$(BLTIN):	bltin
+
+bltin:
 			$(MAKE) -C $(BLTIN)
 
-all:		bltins $(NAME)
+all:		$(NAME)
 
 $(LIB):		lib
 

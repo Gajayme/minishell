@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   cmdvalidator.c                                     :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: dcelsa <dcelsa@student.42.fr>              +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2022/04/02 16:06:31 by dcelsa            #+#    #+#             */
+/*   Updated: 2022/04/02 16:06:32 by dcelsa           ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "minishell.h"
 
 static void	redirvalidator(t_bounds *bounds, t_list *qtxt, char *prog)
@@ -54,11 +66,16 @@ static void	checkbounds(t_bounds *crsr, char *prog)
 	parserr(prog, crsr->end);
 }
 
-void	strvalidator(char *prog, char *cmds)
+int	strvalidator(char *prog, char *cmds)
 {
 	t_bounds	crsr;
 	t_list		*qtxt;
+	pid_t		pid;
+	int			stat_loc;
 
+	pid = fork();
+	if (pid && waitpid(pid, &stat_loc, WUNTRACED))
+		return (stat_loc);
 	qtxt = NULL;
 	quotedtxt(cmds, prog, &qtxt, TRUE);
 	dlrvalidator(cmds, prog, qtxt);
@@ -71,4 +88,5 @@ void	strvalidator(char *prog, char *cmds)
 		redirvalidator(&crsr, qtxt, prog);
 		crsr.begin = crsr.end + (*crsr.end == *(crsr.end + 1));
 	}
+	exit(0);
 }

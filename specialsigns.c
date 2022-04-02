@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   specialsigns.c                                     :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: dcelsa <dcelsa@student.42.fr>              +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2022/04/02 15:54:16 by dcelsa            #+#    #+#             */
+/*   Updated: 2022/04/02 15:54:20 by dcelsa           ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "minishell.h"
 
 char	*slash(char *end, char *home)
@@ -22,7 +34,7 @@ t_bool	rediravoider(char *crsr, char *cmd, t_bool forwld)
 	return (FALSE);
 }
 
-static void specialfiller(char *crsr, t_head *head, t_list **exps, t_list *qtxt)
+static void	specialfiller(char *crsr, t_head *head, t_list **exps, t_list *qtxt)
 {
 	t_bounds	line;
 
@@ -41,15 +53,15 @@ static void specialfiller(char *crsr, t_head *head, t_list **exps, t_list *qtxt)
 		ft_lstadd_back(exps, ft_lstnew(malloc(sizeof(t_exp))));
 		expcast(ft_lstlast(*exps))->sns.begin = line.begin;
 		expcast(ft_lstlast(*exps))->sns.end = ++line.begin;
-		expcast(ft_lstlast(*exps))->val = slash(line.begin,
-							findenv("HOME", ft_strlen("HOME"), head, FALSE));
+		(expcast(ft_lstlast(*exps))->val) = slash(line.begin,
+				findenv("HOME", ft_strlen("HOME"), head, FALSE));
 	}
 	else
 		return ;
 	specialfiller(line.begin, head, exps, qtxt);
 }
 
-static char *newcmdbuilder(char *cmd, t_list *crsr, t_list *exps)
+static char	*newcmdbuilder(char *cmd, t_list *crsr, t_list *exps)
 {
 	char	*new;
 	char	*crs;
@@ -59,7 +71,7 @@ static char *newcmdbuilder(char *cmd, t_list *crsr, t_list *exps)
 	while (crsr)
 	{
 		size += expcast(crsr)->sns.begin - expcast(crsr)->sns.end
-				+ ft_strlen(expcast(crsr)->val);
+			+ ft_strlen(expcast(crsr)->val);
 		crsr = crsr->next;
 	}
 	new = malloc(sizeof(*new) * size);

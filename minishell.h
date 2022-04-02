@@ -6,7 +6,7 @@
 /*   By: dcelsa <dcelsa@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/04 21:08:37 by dcelsa            #+#    #+#             */
-/*   Updated: 2022/04/01 20:03:59 by dcelsa           ###   ########.fr       */
+/*   Updated: 2022/04/02 20:09:26 by dcelsa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,6 +27,8 @@
 # include <sys/signal.h>
 # include "libft.h"
 # include "get_next_line.h"
+# include "cd.h"
+# include "exit.h"
 
 # ifndef TRUE
 #  define TRUE 1
@@ -93,9 +95,10 @@ typedef struct s_cmd {
 }	t_cmd;
 
 typedef struct s_fds {
-	int	env[2];
-	int	path[2];
-	int	ex[2];
+	t_list	*envfds;
+	int		env[2];
+	int		path[2];
+	int		ex[2];
 }	t_fds;
 
 typedef struct s_exp {
@@ -118,7 +121,7 @@ int			access_checker(char *path);
 int			arrsize(char **argv);
 t_arg		*argcast(t_list *lst);
 t_bounds	*boundcast(t_list *lst);
-void		builtinhndlr(t_cmd *cmd, t_fds *fds, t_list *env);
+void		builtinhndlr(t_cmd *cmd, t_list *env, t_head *head, t_bool *isbuiltin);
 void		clearcmdlst(void *content);
 void		clearexp(void *content);
 void		clearredirlst(void *content);
@@ -135,19 +138,19 @@ int			forker(t_list *curcmd, t_head *head, int rightpfd[2], pid_t *pidsfd);
 t_list		*getprevstruct(t_list *begin, t_list *crnt);
 void		handlecmd(t_head *head, int *stat_loc);
 t_bool		istoken(char *str, char *tokens);
-t_list		*lstcast(t_list *lst);
 int			maninp(char *limiter);
 void		mounter(int leftpfd[2], int rightpfd[2], int fd[2], char *prog);
 t_bool		outqt(char *str, t_list *qtxt, t_bool strict);
 void		parser(t_head *head, t_list **cmdlst);
 void		parserr(char *prog, char *place);
-int			pipehndlr(t_head *head, t_list **crsr);
+void		readenv(t_list **env, char *path, char *envpath, int envfd);
 t_bool		rediravoider(char *crsr, char *cmd, t_bool forwld);
 void		redirerr(char *prog, char *place);
 t_redir		*rdrcast(t_list *lst);
 void		rdrhndlr(t_cmd	*cmd, t_fds *fds, t_head *head);
+char		*shellinit(char **path, char **prog, char *argv, t_list **env);
 char		*slash(char *end, char *home);
-void		strvalidator(char *prog, char *cmds);
+int			strvalidator(char *prog, char *cmds);
 int			structindex(t_list *begin, t_list *curcmd);
 char		*symbdefiner(t_bounds *cmd, char *s, t_list *qtxt);
 char		*txtcopy(t_bounds *bounds, t_list **args, t_list *qtxt, t_bool skipqts);

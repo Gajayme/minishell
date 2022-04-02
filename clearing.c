@@ -1,31 +1,33 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   cd.c                                               :+:      :+:    :+:   */
+/*   clearing.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: dcelsa <dcelsa@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/03/07 21:03:40 by lyubov            #+#    #+#             */
-/*   Updated: 2022/04/02 16:21:02 by dcelsa           ###   ########.fr       */
+/*   Created: 2022/04/02 15:52:52 by dcelsa            #+#    #+#             */
+/*   Updated: 2022/04/02 15:52:53 by dcelsa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "cd.h"
+#include "minishell.h"
 
-int	cd(char *shell_name, char *dirname, t_list **list)
+void	clearexp(void *content)
 {
-	int	flag;
+	free(((t_exp *)content)->val);
+}
 
-	flag = 0;
-	if (!dirname)
-	{
-		if (find_home(shell_name, *list, &dirname))
-			return (1);
-		flag = 1;
-	}
-	if (dir_changer(dirname, list) && pprrr(shell_name, dirname))
-		return (1);
-	if (flag)
-		free(dirname);
-	return (0);
+void	clearredirlst(void *content)
+{
+	free(((t_redir *)content)->florlmt);
+}
+
+static void	clearargs(void *content)
+{
+	free(((t_arg *)content)->arg);
+}
+
+void	clearcmdlst(void *content)
+{
+	ft_lstclear(&((t_cmd *)content)->args, &clearargs);
 }

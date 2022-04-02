@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   quotsnredirs.c                                     :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: dcelsa <dcelsa@student.42.fr>              +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2022/04/02 15:59:23 by dcelsa            #+#    #+#             */
+/*   Updated: 2022/04/02 19:45:22 by dcelsa           ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "minishell.h"
 
 void	quotedtxt(char *cmd, char *prog, t_list **qtxt, t_bool vldmod)
@@ -54,18 +66,18 @@ static char	*specialhndlr(t_bounds *dlr, t_head *head)
 	head->cmd = dlr->begin;
 	head->isredir = TRUE;
 	expandspecialsigns(head, &qtxt);
-	head->isredir = FALSE;
 	new.begin = head->cmd;
 	head->cmd = cmd;
 	new.end = new.begin + ft_strlen(new.begin) - 1;
 	cmd = txtcopy(&new, NULL, qtxt, FALSE);
 	free(new.begin);
 	new.end = dlr->begin;
-	if (!istoken(new.end, "$*"))
+	if (head->isredir-- && !istoken(new.end, "$*"))
 		new.end = symbdefiner(dlr, "$*", qtxt);
 	new.end -= (!*new.end);
 	ref = ft_split(cmd, ' ');
-	if (((*new.end == '$' && outqt(new.end, qtxt, TRUE)) || *new.end == '*') && arrsize(ref) > 1)
+	if (((*new.end == '$' && outqt(new.end, qtxt, TRUE)) || *new.end == '*')
+		&& arrsize(ref) > 1)
 		redirerr(head->prog, dlr->begin);
 	eraser(ref);
 	ft_lstclear(&qtxt, &free);
@@ -92,7 +104,7 @@ static int	rdr(t_list *redirs, t_bool src, t_head *head)
 			file.end = file.begin + ft_strlen(file.begin);
 			redir->florlmt = specialhndlr(&file, head);
 			fd = file_check(redir->florlmt, R_OK * src + W_OK * (!src),
-							redir->apporstdin, head->prog);
+					redir->apporstdin, head->prog);
 		}
 		redirs = redirs->next;
 	}
@@ -107,12 +119,13 @@ void	rdrhndlr(t_cmd	*cmd, t_fds *fds, t_head *head)
 	cmd->fd[0] = rdr(cmd->redirs, TRUE, head);
 	cmd->fd[1] = rdr(cmd->redirs, FALSE, head);
 	if (cmd->fd[1] != 1 && ((ft_lstsize(cmd->args) > 1
-		&& !ft_strncmp(ncmd, "export", -1)) || !ft_strncmp(ncmd, "cd", -1)
-		|| !ft_strncmp(ncmd, "exit", -1)))
+				&& !ft_strncmp(ncmd, "export", -1))
+			|| !ft_strncmp(ncmd, "cd", -1)
+			|| !ft_strncmp(ncmd, "exit", -1)))
 		close(cmd->fd[1]);
 	if ((ft_lstsize(cmd->args) > 1 && !ft_strncmp(ncmd, "export", -1))
 		|| !ft_strncmp(ncmd, "unset", -1))
-		cmd->fd[1] = fds->env[1];
+		cmd->fd[1] = ((int *)ft_lstlast(fds->envfds)->content)[1];
 	if (!ft_strncmp(ncmd, "cd", -1))
 		cmd->fd[1] = fds->path[1];
 	if (!ft_strncmp(ncmd, "exit", -1))

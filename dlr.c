@@ -1,6 +1,18 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   dlr.c                                              :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: dcelsa <dcelsa@student.42.fr>              +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2022/04/02 15:30:47 by dcelsa            #+#    #+#             */
+/*   Updated: 2022/04/02 15:30:52 by dcelsa           ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "minishell.h"
 
-static int avoidwildcrd(char *word, char *buf, int size)
+static int	avoidwildcrd(char *word, char *buf, int size)
 {
 	char	**split;
 	char	**cpy;
@@ -17,9 +29,11 @@ static int avoidwildcrd(char *word, char *buf, int size)
 			word += ft_strlen(*split);
 		if (!buf && *split++)
 			continue ;
-		*buf++ = '"' * (!ft_strchr(word, '"')) + '\'' * (!(!ft_strchr(word, '"')));
+		*buf++ = '"' * (!ft_strchr(word, '"'))
+			+ '\'' * (!(!ft_strchr(word, '"')));
 		buf += ft_strlcpy(buf, *split, ft_strlen(*split) + 1);
-		*buf++ = '"' * (!ft_strchr(word, '"')) + '\'' * (!(!ft_strchr(word, '"')));
+		*buf++ = '"' * (!ft_strchr(word, '"'))
+			+ '\'' * (!(!ft_strchr(word, '"')));
 		*buf = '\0';
 		word += ft_strlen(*split++);
 	}
@@ -58,9 +72,11 @@ char	*findenv(char *name, int size, t_head *head, t_bool quoted)
 	crsr = head->env;
 	while (crsr)
 	{
-		if (quoted && !ft_strncmp(name, crsr->content, size) && *((char *)crsr->content + size) == '=')
+		if (quoted && !ft_strncmp(name, crsr->content, size)
+			&& *((char *)crsr->content + size) == '=')
 			return (ft_strdup(crsr->content + ++size));
-		if (!ft_strncmp(name, crsr->content, size) && *((char *)crsr->content + size) == '=')
+		if (!ft_strncmp(name, crsr->content, size)
+			&& *((char *)crsr->content + size) == '=')
 			return (arrjoiner(ft_split(crsr->content + ++size, ' ')));
 		crsr = crsr->next;
 	}
@@ -82,7 +98,9 @@ char	*dlrhndlr(char *begin, t_head *head, t_list **exps, t_list *qtxt)
 	expcast(ft_lstlast(*exps))->sns.end = word.end;
 	word.begin++;
 	word.end -= istoken(word.end, "'\" *<>&|()$") + (!*word.end);
-	expcast(ft_lstlast(*exps))->val = findenv(word.begin,
-		word.end - word.begin + 1, head, !outqt(word.begin - 1, qtxt, TRUE));
-	return (word.end + istoken(word.end + 1, "'\" *<>&|()$") + (!*(word.end + 1)));
+	(expcast(ft_lstlast(*exps))->val) = findenv(word.begin,
+			word.end - word.begin + 1, head,
+			!outqt(word.begin - 1, qtxt, TRUE));
+	return (word.end + istoken(word.end + 1,
+			"'\" *<>&|()$") + (!*(word.end + 1)));
 }

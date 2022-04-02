@@ -6,7 +6,7 @@
 /*   By: dcelsa <dcelsa@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/04 19:57:13 by dcelsa            #+#    #+#             */
-/*   Updated: 2022/03/31 23:11:19 by dcelsa           ###   ########.fr       */
+/*   Updated: 2022/04/02 16:01:25 by dcelsa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,11 +24,13 @@ int	file_check(char *file, int mod, t_bool app, char *prog)
 	if (mod == R_OK && ((fd > 0 && !close(fd)) || fd))
 		fd = error_handler(prog, file, open(file, O_RDONLY));
 	if (mod == W_OK && !app && ((fd > 0 && !close(fd)) || fd))
-		fd = error_handler(prog, file, open(file, O_WRONLY | O_TRUNC | O_APPEND));
+		fd = error_handler(prog, file, open(file,
+					O_WRONLY | O_TRUNC | O_APPEND));
 	else if (mod == W_OK && ((fd > 0 && !close(fd)) || fd))
 		fd = error_handler(prog, file, open(file, O_WRONLY | O_APPEND));
 	else if (!fd)
-		fd = error_handler(prog, file, open(file, O_WRONLY | O_CREAT | O_EXCL | O_APPEND, 420));
+		fd = error_handler(prog, file, open(file,
+					O_WRONLY | O_CREAT | O_EXCL | O_APPEND, 420));
 	if (!fd || fd == -1)
 		error_handler(prog, file, -1);
 	return (fd);

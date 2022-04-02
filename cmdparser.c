@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   cmdparser.c                                        :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: dcelsa <dcelsa@student.42.fr>              +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2022/04/02 15:59:47 by dcelsa            #+#    #+#             */
+/*   Updated: 2022/04/02 15:59:50 by dcelsa           ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "minishell.h"
 
 static void	redirdefiner(t_bounds *cmd, t_list **redirs, t_list *qtxt)
@@ -18,7 +30,7 @@ static void	redirdefiner(t_bounds *cmd, t_list **redirs, t_list *qtxt)
 	rdr.end = cmd->end;
 	rdr.end = symbdefiner(&rdr, "<> |&", qtxt);
 	rdr.end -= istoken(rdr.end, "<> |&");
-	rdrcast(ft_lstlast(*redirs))->florlmt = txtcopy(&rdr, NULL, qtxt, TRUE);
+	(rdrcast(ft_lstlast(*redirs))->florlmt) = txtcopy(&rdr, NULL, qtxt, TRUE);
 	rdr.begin = rdr.end + 1;
 	rdr.end = cmd->end;
 	if (rdr.begin >= rdr.end)
