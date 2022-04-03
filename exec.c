@@ -6,7 +6,7 @@
 /*   By: dcelsa <dcelsa@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/04 19:57:04 by dcelsa            #+#    #+#             */
-/*   Updated: 2022/04/03 20:04:11 by dcelsa           ###   ########.fr       */
+/*   Updated: 2022/04/03 21:09:17 by dcelsa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,6 +50,7 @@ static int	executor(t_cmd *cmd, char **env, char *prog, t_bool isbuiltin)
 	flags = cmdarr(cmd->args);
 	if (!flags)
 		return (error_handler(prog, cmd->args->content, -1));
+	signal(SIGQUIT, SIG_DFL);
 	if (ft_strchr(flags[0 + isbuiltin], '/'))
 	{
 		path = flags[isbuiltin];

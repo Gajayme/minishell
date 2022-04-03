@@ -6,7 +6,7 @@
 /*   By: dcelsa <dcelsa@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/04 21:08:37 by dcelsa            #+#    #+#             */
-/*   Updated: 2022/04/03 20:03:20 by dcelsa           ###   ########.fr       */
+/*   Updated: 2022/04/03 21:08:46 by dcelsa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -127,6 +127,7 @@ char		**cmdarr(t_list *args);
 t_cmd		*cmdcast(t_list *lst);
 int			cmdnotfound(char *prog, char *place);
 char		*dlrhndlr(char *begin, t_head *head, t_list **exps, t_list *qtxt);
+void		emptyintsig(int signum);
 int			eraser(char **p);
 int			error_handler(char *prog, char *place, int funcres);
 char		*expandspecialsigns(char *oldcmd, t_head *head, t_list **qtxt);
@@ -136,6 +137,7 @@ char		*findenv(char *name, int size, t_head *head, t_bool quoted);
 int			forker(t_list *curcmd, t_head *head, int rightpfd[2], pid_t *pidsfd);
 t_list		*getprevstruct(t_list *begin, t_list *crnt);
 void		handlecmd(t_head *head, int *stat_loc);
+void		intsig(int signum);
 t_bool		istoken(char *str, char *tokens);
 int			maninp(char *limiter);
 void		mounter(int leftpfd[2], int rightpfd[2], int fd[2], char *prog);

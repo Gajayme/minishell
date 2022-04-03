@@ -6,7 +6,7 @@
 /*   By: dcelsa <dcelsa@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/02 16:01:52 by dcelsa            #+#    #+#             */
-/*   Updated: 2022/04/03 19:52:10 by dcelsa           ###   ########.fr       */
+/*   Updated: 2022/04/03 21:14:58 by dcelsa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,34 +25,37 @@ void	writecdpath(t_head *head, t_list *args, int stat_lock)
 		path = args->next->content;
 	else
 		path = findenv("HOME", ft_strlen("HOME"), head, FALSE);
-	ft_putstr_fd(path, head->fds.path[1]);
-	ft_putstr_fd("\n", head->fds.path[1]);
+	ft_putendl_fd(path, head->fds.path[1]);
 	cd(head->prog, path, &head->env);
 	if (ft_lstsize(args) == 1)
 		free(path);
 }
 
-static int	grand_finale(int pidcount, pid_t *pids, t_head *head, t_list *args)
+static void	grand_finale(int pidcount, pid_t *pids, t_head *head, t_list *args)
 {
 	int		i;
-	int		stat_lock;
 	char	*num;
 
 	i = -1;
 	while (++i < pidcount)
-		error_handler(head->prog, NULL, waitpid(pids[i], &stat_lock, WUNTRACED));
+		error_handler(head->prog, NULL, waitpid(pids[i], &head->referr, WUNTRACED));
 	free(pids);
-	num = ft_itoa(WIFSIGNALED(stat_lock));
-	ft_putstr_fd(num, head->fds.issig[1]);
-	ft_putstr_fd("\n", head->fds.issig[1]);
+	head->issig = WIFSIGNALED(head->referr);
+	num = ft_itoa(head->issig);
+	ft_putendl_fd(num, head->fds.issig[1]);
 	free(num);
-	num = ft_itoa(stat_lock);
-	ft_putstr_fd(num, head->fds.issig[1]);
-	ft_putstr_fd("\n", head->fds.issig[1]);
+	num = ft_itoa(head->referr);
+	ft_putendl_fd(num, head->fds.issig[1]);
 	free(num);
+	if (head->issig && WTERMSIG(head->referr) == SIGQUIT)
+	{
+		num = ft_itoa(SIGQUIT);
+		ft_putstr_fd("Quit: ", 2);
+		ft_putendl_fd(num, 2);
+		free(num);
+	}
 	if (pidcount < 2)
-		writecdpath(head, args, stat_lock);
-	return (stat_lock);
+		writecdpath(head, args, head->referr);
 }
 
 t_bool	skippedcmd(int referr, t_list **crsr, t_list *cmdlst)
@@ -88,7 +91,7 @@ static int	pipehndlr(t_head *head, t_list **crsr, t_list *cmdlst)
 	pids = ft_bzero(malloc(sizeof(*pids) * pipecmds), sizeof(*pids) * pipecmds);
 	ft_bzero(nullfd, sizeof(*nullfd) * 2);
 	forker(ft_lstlast(head->pipe), head, nullfd, pids);
-	head->referr = grand_finale(pipecmds, pids, head, cmdcast(head->pipe)->args);
+	grand_finale(pipecmds, pids, head, cmdcast(head->pipe)->args);
 	ft_lstclear(&head->pipe, NULL);
 	return (head->referr);
 }
@@ -100,8 +103,7 @@ void	rewriteenv(t_list *env, t_fds *fds)
 	close(fds->issig[1]);
 	while (env)
 	{
-		ft_putstr_fd(env->content, fds->env[1]);
-		ft_putstr_fd("\n", fds->env[1]);
+		ft_putendl_fd(env->content, fds->env[1]);
 		env = env->next;
 	}
 	close(fds->env[1]);

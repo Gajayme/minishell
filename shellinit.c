@@ -6,13 +6,18 @@
 /*   By: dcelsa <dcelsa@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/02 16:34:31 by dcelsa            #+#    #+#             */
-/*   Updated: 2022/04/03 18:51:05 by dcelsa           ###   ########.fr       */
+/*   Updated: 2022/04/03 21:17:10 by dcelsa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-static void	ctrlc_handler(int signum)
+void	intsig(int signum)
+{
+	(void)signum;
+}
+
+void	emptyintsig(int signum)
 {
 	(void)signum;
 	ft_putstr_fd("\n", 1);
@@ -76,13 +81,9 @@ char	*shellinit(t_head *head, char *argv)
 	p.c_lflag &= ~(ECHOCTL);
 	tcsetattr(0, 0, &p);
 	signal(SIGQUIT, SIG_IGN);
-	signal(SIGINT, &ctrlc_handler);
 	pipe(pfd);
 	while (*environ)
-	{
-		ft_putstr_fd(*environ++, pfd[1]);
-		ft_putstr_fd("\n", pfd[1]);
-	}
+		ft_putendl_fd(*environ++, pfd[1]);
 	close(pfd[1]);
 	rememberpath(&head->path, argv);
 	head->env = NULL;

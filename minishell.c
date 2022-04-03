@@ -6,7 +6,7 @@
 /*   By: dcelsa <dcelsa@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/02 16:35:07 by dcelsa            #+#    #+#             */
-/*   Updated: 2022/04/03 19:58:25 by dcelsa           ###   ########.fr       */
+/*   Updated: 2022/04/03 21:15:50 by dcelsa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -95,9 +95,11 @@ int	main(int argc, char **argv)
 	prompt = shellinit(&head, *argv);
 	while (1)
 	{
+		signal(SIGINT, &emptyintsig);
 		head.cmd = readline(prompt);
+		signal(SIGINT, &intsig);
 		if (!head.cmd)
-			ft_putstr_fd("exit\n", 1);
+			ft_putendl_fd("exit", 1);
 		if (!head.cmd)
 			break ;
 		if (*head.cmd)
