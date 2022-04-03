@@ -6,11 +6,20 @@
 /*   By: dcelsa <dcelsa@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/02 16:02:23 by dcelsa            #+#    #+#             */
-/*   Updated: 2022/04/02 16:02:27 by dcelsa           ###   ########.fr       */
+/*   Updated: 2022/04/03 20:03:10 by dcelsa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
+
+int	cmdnotfound(char *prog, char *place)
+{
+	ft_putstr_fd(prog, 2);
+	ft_putstr_fd(": ", 2);
+	ft_putstr_fd(place, 2);
+	ft_putstr_fd(": command not found\n", 2);
+	exit(127);
+}
 
 void	redirerr(char *prog, char *place)
 {

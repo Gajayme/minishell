@@ -6,7 +6,7 @@
 /*   By: dcelsa <dcelsa@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/02 15:54:16 by dcelsa            #+#    #+#             */
-/*   Updated: 2022/04/03 01:29:09 by dcelsa           ###   ########.fr       */
+/*   Updated: 2022/04/03 19:03:40 by dcelsa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,19 +21,6 @@ char	*slash(char *end, char *home)
 	return (end);
 }
 
-t_bool	rediravoider(char *crsr, char *cmd, t_bool forwld)
-{
-	if (!forwld && crsr > cmd && istoken(crsr, "~$") && crsr--)
-		while (crsr > cmd && *crsr == ' ')
-			crsr--;
-	if (forwld && crsr > cmd)
-		while (crsr > cmd && !istoken(crsr, "<>&|"))
-			crsr--;
-	if (istoken(crsr, "<>"))
-		return (TRUE);
-	return (FALSE);
-}
-
 static void	specialfiller(char *crsr, t_head *head, t_list **exps, t_list *qtxt)
 {
 	t_bounds	line;
@@ -42,9 +29,7 @@ static void	specialfiller(char *crsr, t_head *head, t_list **exps, t_list *qtxt)
 	line.end = crsr + ft_strlen(crsr);
 	if (!istoken(line.begin, "~$"))
 		line.begin = symbdefiner(&line, "~$", qtxt);
-	if (!head->isredir && rediravoider(line.begin, head->cmd, FALSE))
-		line.begin++;
-	else if (*line.begin == '$')
+	if (*line.begin == '$')
 		line.begin = dlrhndlr(line.begin, head, exps, qtxt);
 	else if (*line.begin == '~'
 		&& (istoken(line.begin + 1, " /") || !*(line.begin + 1))
@@ -93,31 +78,30 @@ static char	*newcmdbuilder(char *cmd, t_list *crsr, t_list *exps)
 	return (new);
 }
 
-void	expandspecialsigns(t_head *head, t_list **qtxt)
+char	*expandspecialsigns(char *oldcmd, t_head *head, t_list **qtxt)
 {
 	t_list	*expansions;
-	char	*cmd;
+	char	*cmd[2];
 
 	*qtxt = NULL;
-	quotedtxt(head->cmd, head->prog, qtxt, FALSE);
+	quotedtxt(oldcmd, head->prog, qtxt, FALSE);
 	expansions = NULL;
-	specialfiller(head->cmd, head, &expansions, *qtxt);
+	specialfiller(oldcmd, head, &expansions, *qtxt);
+	cmd[0] = oldcmd;
 	if (expansions)
-	{
-		cmd = newcmdbuilder(head->cmd, expansions, expansions);
-		free(head->cmd);
-		head->cmd = cmd;
-	}
+		cmd[0] = newcmdbuilder(oldcmd, expansions, expansions);
 	ft_lstclear(&expansions, &clearexp);
 	ft_lstclear(qtxt, &free);
 	*qtxt = NULL;
-	quotedtxt(head->cmd, head->prog, qtxt, FALSE);
-	wildcardhndlr(head->cmd, head, &expansions, *qtxt);
+	quotedtxt(cmd[0], head->prog, qtxt, FALSE);
+	wildcardhndlr(cmd[0], head, &expansions, *qtxt);
 	if (expansions)
 	{
-		cmd = newcmdbuilder(head->cmd, expansions, expansions);
-		free(head->cmd);
-		head->cmd = cmd;
+		cmd[1] = newcmdbuilder(cmd[0], expansions, expansions);
+		if (cmd[0] != oldcmd)
+			free(cmd[0]);
+		cmd[0] = cmd[1];
 	}
 	ft_lstclear(&expansions, &clearexp);
+	return (cmd[0]);
 }

@@ -6,7 +6,7 @@
 /*   By: dcelsa <dcelsa@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/02 15:53:01 by dcelsa            #+#    #+#             */
-/*   Updated: 2022/04/02 15:53:02 by dcelsa           ###   ########.fr       */
+/*   Updated: 2022/04/03 15:35:54 by dcelsa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,11 +23,6 @@ t_cmd	*cmdcast(t_list *lst)
 }
 
 t_redir	*rdrcast(t_list *lst)
-{
-	return (lst->content);
-}
-
-t_arg	*argcast(t_list *lst)
 {
 	return (lst->content);
 }

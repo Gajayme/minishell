@@ -6,7 +6,7 @@
 /*   By: dcelsa <dcelsa@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/02 15:59:47 by dcelsa            #+#    #+#             */
-/*   Updated: 2022/04/02 23:56:08 by dcelsa           ###   ########.fr       */
+/*   Updated: 2022/04/03 17:18:58 by dcelsa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,8 +82,8 @@ void	parser(t_head *head, t_list **cmdlst)
 	t_cmd		*curcmd;
 	t_list		*qtxt;
 
-	head->isredir = FALSE;
-	expandspecialsigns(head, &qtxt);
+	qtxt = NULL;
+	quotedtxt(head->cmd, head->prog, &qtxt, FALSE);
 	cmd.begin = head->cmd;
 	while (cmd.begin < head->cmd + ft_strlen(head->cmd))
 	{

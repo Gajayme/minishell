@@ -6,7 +6,7 @@
 /*   By: dcelsa <dcelsa@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/02 16:35:07 by dcelsa            #+#    #+#             */
-/*   Updated: 2022/04/03 00:29:29 by dcelsa           ###   ########.fr       */
+/*   Updated: 2022/04/03 19:58:25 by dcelsa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,36 +34,56 @@ void	readenv(t_list **env, char *path, char *envpath, int envfd)
 	free(envpath);
 	if (!pathwas)
 		ft_lstadd_back(env, ft_lstnew(ft_strjoin("PATH=", path)));
+	close(envfd);
 }
 
-void	handleexeptions(t_fds *fds, t_list **env, char *path, char *prog)
+void	mainproccd(int pthfd, char *prog, t_list **env)
 {
-	char	*buf;
 	char	*pth;
+	char	*buf;
 
-	readenv(env, path, ft_strjoin(":", path), fds->env[0]);
-	close(fds->env[0]);
 	pth = NULL;
-	buf = get_next_line(fds->path[0]);
+	buf = get_next_line(pthfd);
 	while (buf)
 	{
 		if (pth)
 			free(pth);
 		pth = buf;
-		buf = get_next_line(fds->path[0]);
+		pth[ft_strlen(pth) - 1] = '\0';
+		buf = get_next_line(pthfd);
 	}
 	if (pth)
 		cd(prog, pth, env);
 	if (pth)
 		free(pth);
-	close(fds->path[0]);
-	buf = get_next_line(fds->ex[0]);
+	close(pthfd);
+}
+
+void	handleexeptions(t_head *head)
+{
+	char	*buf;
+
+	readenv(&head->env, head->path, ft_strjoin(":", head->path), head->fds.env[0]);
+	mainproccd(head->fds.path[0], head->prog, &head->env);
+	buf = get_next_line(head->fds.issig[0]);
+	while (buf)
+	{
+		head->issig = ft_atoi(buf);
+		free(buf);
+		buf = get_next_line(head->fds.issig[0]);
+		head->referr = ft_atoi(buf);
+		free(buf);
+		buf = get_next_line(head->fds.issig[0]);
+	}
+	close(head->fds.issig[0]);
+	buf = get_next_line(head->fds.ex[0]);
 	if (buf)
 	{
 		free(buf);
-		exit(0);
+		if (ft_atoi(buf))
+			exit(0);
 	}
-	close(fds->ex[0]);
+	close(head->fds.ex[0]);
 }
 
 int	main(int argc, char **argv)
@@ -85,7 +105,7 @@ int	main(int argc, char **argv)
 		if (!strvalidator(head.prog, head.cmd))
 		{
 			handlecmd(&head, &head.referr);
-			handleexeptions(&head.fds, &head.env, head.path, head.prog);
+			handleexeptions(&head);
 		}
 		free(head.cmd);
 	}

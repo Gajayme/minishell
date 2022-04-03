@@ -6,7 +6,7 @@
 /*   By: dcelsa <dcelsa@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/02 15:59:23 by dcelsa            #+#    #+#             */
-/*   Updated: 2022/04/02 19:45:22 by dcelsa           ###   ########.fr       */
+/*   Updated: 2022/04/03 19:18:16 by dcelsa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,29 +59,24 @@ static char	*specialhndlr(t_bounds *dlr, t_head *head)
 {
 	t_bounds	new;
 	t_list		*qtxt;
-	char		*cmd;
 	char		**ref;
 
-	cmd = head->cmd;
-	head->cmd = dlr->begin;
-	head->isredir = TRUE;
-	expandspecialsigns(head, &qtxt);
-	new.begin = head->cmd;
-	head->cmd = cmd;
+	new.begin = expandspecialsigns(dlr->begin, head, &qtxt);
 	new.end = new.begin + ft_strlen(new.begin) - 1;
-	cmd = txtcopy(&new, NULL, qtxt, FALSE);
+	new.end = txtcopy(&new, NULL, qtxt, TRUE);
 	free(new.begin);
+	new.begin = new.end;
 	new.end = dlr->begin;
-	if (head->isredir-- && !istoken(new.end, "$*"))
+	if (!istoken(new.end, "$*"))
 		new.end = symbdefiner(dlr, "$*", qtxt);
 	new.end -= (!*new.end);
-	ref = ft_split(cmd, ' ');
+	ref = ft_split(new.begin, ' ');
 	if (((*new.end == '$' && outqt(new.end, qtxt, TRUE)) || *new.end == '*')
 		&& arrsize(ref) > 1)
 		redirerr(head->prog, dlr->begin);
 	eraser(ref);
 	ft_lstclear(&qtxt, &free);
-	return (cmd);
+	return (new.begin);
 }
 
 static int	rdr(t_list *redirs, t_bool src, t_head *head)
@@ -115,7 +110,7 @@ void	rdrhndlr(t_cmd	*cmd, t_fds *fds, t_head *head)
 {
 	char	*ncmd;
 
-	ncmd = argcast(cmd->args)->arg;
+	ncmd = cmd->args->content;
 	cmd->fd[0] = rdr(cmd->redirs, TRUE, head);
 	cmd->fd[1] = rdr(cmd->redirs, FALSE, head);
 	if (cmd->fd[1] != 1 && ((ft_lstsize(cmd->args) > 1

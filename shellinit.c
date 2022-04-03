@@ -6,7 +6,7 @@
 /*   By: dcelsa <dcelsa@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/02 16:34:31 by dcelsa            #+#    #+#             */
-/*   Updated: 2022/04/03 00:29:46 by dcelsa           ###   ########.fr       */
+/*   Updated: 2022/04/03 18:51:05 by dcelsa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -88,7 +88,6 @@ char	*shellinit(t_head *head, char *argv)
 	head->env = NULL;
 	readenv(&head->env, head->path, ft_strjoin(":", head->path), pfd[0]);
 	increaselvl(&head->env);
-	close(pfd[0]);
 	head->prog = argv;
 	if (ft_strrchr(argv, '/'))
 		head->prog = ft_strrchr(argv, '/') + 1;

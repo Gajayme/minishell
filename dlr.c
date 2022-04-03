@@ -6,7 +6,7 @@
 /*   By: dcelsa <dcelsa@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/02 15:30:47 by dcelsa            #+#    #+#             */
-/*   Updated: 2022/04/03 01:21:52 by dcelsa           ###   ########.fr       */
+/*   Updated: 2022/04/03 19:01:49 by dcelsa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,11 +69,9 @@ char	*findenv(char *name, int size, t_head *head, t_bool quoted)
 
 	if (*name == '?')
 	{
-		printf("err: %d %d %d\n", head->referr, WIFSIGNALED(head->referr), WIFEXITED(head->referr));
-		if (WIFSIGNALED(head->referr))
+		if (head->issig)
 			return (ft_itoa(128 + WTERMSIG(head->referr)));
-		if (WIFEXITED(head->referr))
-			return (ft_itoa(WEXITSTATUS(head->referr)));
+		return (ft_itoa(WEXITSTATUS(head->referr)));
 	}
 	crsr = head->env;
 	while (crsr)
@@ -96,7 +94,7 @@ char	*dlrhndlr(char *begin, t_head *head, t_list **exps, t_list *qtxt)
 	word.begin = begin;
 	word.end = word.begin + ft_strlen(word.begin);
 	word.end = symbdefiner(&word, "'\" *<>&|$?", qtxt);
-	if (word.end == word.begin || (!head->isredir && *word.end == '?')
+	if (word.end == word.begin
 		|| (istoken(word.end, " $") && word.end - 1 == word.begin))
 		return (word.end);
 	ft_lstadd_back(exps, ft_lstnew(malloc(sizeof(t_exp))));

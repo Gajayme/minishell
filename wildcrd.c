@@ -6,7 +6,7 @@
 /*   By: dcelsa <dcelsa@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/02 15:52:38 by dcelsa            #+#    #+#             */
-/*   Updated: 2022/04/03 00:55:17 by dcelsa           ###   ########.fr       */
+/*   Updated: 2022/04/03 18:29:31 by dcelsa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,7 +69,7 @@ static void	partbuilder(t_bounds *word, t_list **parts, t_list *qtxt)
 	bounds.end = symbdefiner(word, "*", qtxt);
 	bounds.end -= istoken(bounds.end, "*") + (!*bounds.end);
 	if (*bounds.begin != '*')
-		ft_lstadd_back(parts, ft_lstnew(txtcopy(&bounds, NULL, qtxt, FALSE)));
+		ft_lstadd_back(parts, ft_lstnew(txtcopy(&bounds, NULL, qtxt, TRUE)));
 	else
 		ft_lstadd_back(parts, ft_lstnew(NULL));
 	bounds.end += istoken(bounds.end + 1, "*") + (!*(bounds.end + 1));
@@ -125,13 +125,9 @@ void	wildcardhndlr(char *crsr, t_head *head, t_list **exps, t_list *qtxt)
 		cmd.begin = symbdefiner(&cmd, "*", qtxt);
 	if (*cmd.begin != '*')
 		return ;
-	while (cmd.begin > head->cmd && !istoken(cmd.begin - 1, "&|<> "))
+	while (cmd.begin > crsr && !istoken(cmd.begin - 1, "&|<> "))
 		cmd.begin--;
 	cmd.end = symbdefiner(&cmd, "&|<> ", qtxt);
-	if (rediravoider(cmd.begin, head->cmd, TRUE))
-		wildcardhndlr(cmd.end, head, exps, qtxt);
-	if (rediravoider(cmd.begin, head->cmd, TRUE))
-		return ;
 	ft_lstadd_back(exps, ft_lstnew(malloc(sizeof(t_exp))));
 	cmd.end -= !*cmd.end;
 	(expcast(ft_lstlast(*exps))->val) = filedef(&cmd, getcwd(NULL, 0), qtxt);

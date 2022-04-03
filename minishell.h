@@ -6,7 +6,7 @@
 /*   By: dcelsa <dcelsa@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/04 21:08:37 by dcelsa            #+#    #+#             */
-/*   Updated: 2022/04/03 00:55:32 by dcelsa           ###   ########.fr       */
+/*   Updated: 2022/04/03 20:03:20 by dcelsa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,12 +83,6 @@ typedef struct s_bracket {
 	t_bool		ispipe;
 }	t_bracket;
 
-typedef struct s_arg
-{
-	char		*word;
-	char		*arg;
-}	t_arg;
-
 typedef struct s_cmd {
 	t_list		*args;
 	t_list		*redirs;
@@ -102,6 +96,7 @@ typedef struct s_fds {
 	int		env[2];
 	int		path[2];
 	int		ex[2];
+	int		issig[2];
 }	t_fds;
 
 typedef struct s_exp {
@@ -113,27 +108,28 @@ typedef struct s_head {
 	char	*cmd;
 	char	*prog;
 	char	*path;
-	t_bool	isredir;
 	t_list	*env;
 	t_list	*pipe;
 	t_fds	fds;
+	t_bool	issig;
 	int		referr;
 }	t_head;
 
 int			access_checker(char *path);
+void		arghndlr(t_list *args, t_list **argshead, t_head *head);
 int			arrsize(char **argv);
-t_arg		*argcast(t_list *lst);
 t_bounds	*boundcast(t_list *lst);
 void		builtinhndlr(t_cmd *cmd, t_head *head, t_bool *isbuiltin);
 void		clearcmdlst(void *content);
 void		clearexp(void *content);
 void		clearredirlst(void *content);
-char		**cmdarr(t_list *args, t_bool itargs);
+char		**cmdarr(t_list *args);
 t_cmd		*cmdcast(t_list *lst);
+int			cmdnotfound(char *prog, char *place);
 char		*dlrhndlr(char *begin, t_head *head, t_list **exps, t_list *qtxt);
 int			eraser(char **p);
 int			error_handler(char *prog, char *place, int funcres);
-void		expandspecialsigns(t_head *head, t_list **qtxt);
+char		*expandspecialsigns(char *oldcmd, t_head *head, t_list **qtxt);
 t_exp		*expcast(t_list *lst);
 int			file_check(char *file, int mod, t_bool app, char *prog);
 char		*findenv(char *name, int size, t_head *head, t_bool quoted);
@@ -147,7 +143,6 @@ t_bool		outqt(char *str, t_list *qtxt, t_bool strict);
 void		parser(t_head *head, t_list **cmdlst);
 void		parserr(char *prog, char *place);
 void		readenv(t_list **env, char *path, char *envpath, int envfd);
-t_bool		rediravoider(char *crsr, char *cmd, t_bool forwld);
 void		redirerr(char *prog, char *place);
 t_redir		*rdrcast(t_list *lst);
 void		rdrhndlr(t_cmd	*cmd, t_fds *fds, t_head *head);

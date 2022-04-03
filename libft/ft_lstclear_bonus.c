@@ -6,7 +6,7 @@
 /*   By: dcelsa <dcelsa@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/10/17 18:57:18 by dcelsa            #+#    #+#             */
-/*   Updated: 2022/03/20 22:21:19 by dcelsa           ###   ########.fr       */
+/*   Updated: 2022/04/03 17:27:29 by dcelsa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,7 @@ void	ft_lstclear(t_list **lst, void (*del)(void *))
 	begin = (*lst);
 	while (begin)
 	{
-		if (del)
+		if (del && begin->content)
 			del(begin->content);
 		tmp = begin;
 		begin = begin->next;

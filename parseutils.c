@@ -6,7 +6,7 @@
 /*   By: dcelsa <dcelsa@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/02 16:00:20 by dcelsa            #+#    #+#             */
-/*   Updated: 2022/04/02 16:00:23 by dcelsa           ###   ########.fr       */
+/*   Updated: 2022/04/03 17:14:09 by dcelsa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,15 +28,13 @@ char	*txtcopy(t_bounds *bounds, t_list **args, t_list *qtxt, t_bool skipqts)
 	begin = bounds->begin;
 	i = 0;
 	while (begin <= bounds->end)
-		if (!(istoken(begin, "\"'") && outqt(begin, qtxt, FALSE) && begin++)
-			|| skipqts)
+		if (!skipqts || !(istoken(begin, "\"'")
+			&& outqt(begin, qtxt, FALSE) && begin++))
 			crsr[i++] = *(begin++);
 	crsr[i] = '\0';
 	if (!args)
 		return (crsr);
-	ft_lstadd_back(args, ft_lstnew(malloc(sizeof(t_arg))));
-	argcast(ft_lstlast(*args))->arg = crsr;
-	argcast(ft_lstlast(*args))->word = bounds->begin;
+	ft_lstadd_back(args, ft_lstnew(crsr));
 	return (crsr);
 }
 

@@ -6,35 +6,52 @@
 /*   By: dcelsa <dcelsa@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/02 16:01:52 by dcelsa            #+#    #+#             */
-/*   Updated: 2022/04/03 01:03:55 by dcelsa           ###   ########.fr       */
+/*   Updated: 2022/04/03 19:52:10 by dcelsa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
+void	writecdpath(t_head *head, t_list *args, int stat_lock)
+{
+	char	*path;
+
+	if (head->fds.envfds)
+		readenv(&head->env, head->path, ft_strjoin(":", head->path),
+			((int *)ft_lstlast(head->fds.envfds)->content)[0]);
+	if (ft_strncmp(args->content, "cd", -1) || stat_lock)
+		return ;
+	if (ft_lstsize(args) > 1)
+		path = args->next->content;
+	else
+		path = findenv("HOME", ft_strlen("HOME"), head, FALSE);
+	ft_putstr_fd(path, head->fds.path[1]);
+	ft_putstr_fd("\n", head->fds.path[1]);
+	cd(head->prog, path, &head->env);
+	if (ft_lstsize(args) == 1)
+		free(path);
+}
+
 static int	grand_finale(int pidcount, pid_t *pids, t_head *head, t_list *args)
 {
-	int	i;
-	int	stat_lock;
+	int		i;
+	int		stat_lock;
+	char	*num;
 
 	i = -1;
 	while (++i < pidcount)
 		error_handler(head->prog, NULL, waitpid(pids[i], &stat_lock, WUNTRACED));
 	free(pids);
-	if (pidcount > 1)
-		return (stat_lock);
-	if (head->fds.envfds)
-		readenv(&head->env, head->path, ft_strjoin(":", head->path), ((int *)ft_lstlast(head->fds.envfds)->content)[0]);
-	if (ft_strncmp(argcast(args)->arg, "cd", -1) || stat_lock)
-		return (stat_lock);
-	if (ft_lstsize(args) > 1)
-	{
-		ft_putstr_fd(argcast(args->next)->arg, head->fds.path[1]);
-		cd(head->prog, argcast(args->next)->arg, &head->env);
-		return (WEXITSTATUS(stat_lock));
-	}
-	ft_putstr_fd(findenv("HOME", ft_strlen("HOME"), head, FALSE), head->fds.path[1]);
-	cd(head->prog, NULL, &head->env);
+	num = ft_itoa(WIFSIGNALED(stat_lock));
+	ft_putstr_fd(num, head->fds.issig[1]);
+	ft_putstr_fd("\n", head->fds.issig[1]);
+	free(num);
+	num = ft_itoa(stat_lock);
+	ft_putstr_fd(num, head->fds.issig[1]);
+	ft_putstr_fd("\n", head->fds.issig[1]);
+	free(num);
+	if (pidcount < 2)
+		writecdpath(head, args, stat_lock);
 	return (stat_lock);
 }
 
@@ -80,6 +97,7 @@ void	rewriteenv(t_list *env, t_fds *fds)
 {
 	close(fds->path[1]);
 	close(fds->ex[1]);
+	close(fds->issig[1]);
 	while (env)
 	{
 		ft_putstr_fd(env->content, fds->env[1]);
@@ -95,14 +113,15 @@ void	handlecmd(t_head *head, int *stat_loc)
 	t_list	*cmdlst;
 	t_list	*crsr;
 
-	if (!pipe(head->fds.path) && !pipe(head->fds.env))
+	if (!pipe(head->fds.path) && !pipe(head->fds.env) && !pipe(head->fds.issig))
 		pipe(head->fds.ex);
 	pid = fork();
 	if (pid && !close(head->fds.env[1]) && !close(head->fds.path[1])
-		&& !close(head->fds.ex[1]) && waitpid(pid, stat_loc, WUNTRACED))
+		&& !close(head->fds.issig[1]) && !close(head->fds.ex[1])
+		&& waitpid(pid, stat_loc, WUNTRACED))
 		return ;
 	if (!close(head->fds.env[0]) && !close(head->fds.path[0])
-		&& !close(head->fds.ex[0]))
+		&& !close(head->fds.issig[0]) && !close(head->fds.ex[0]))
 		cmdlst = NULL;
 	parser(head, &cmdlst);
 	head->fds.envfds = NULL;
