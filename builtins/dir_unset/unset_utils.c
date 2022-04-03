@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   unset_utils.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lyubov <lyubov@student.42.fr>              +#+  +:+       +#+        */
+/*   By: gajayme <gajayme@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/16 19:58:52 by gajayme           #+#    #+#             */
-/*   Updated: 2022/03/31 19:05:14 by lyubov           ###   ########.fr       */
+/*   Updated: 2022/04/03 19:51:45 by gajayme          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,21 +56,40 @@ int	bad_chars(char *arg)
 	return (0);
 }
 
-void	err_finder(char **av)
+void	validator(char **av)
 {
-	int	i;
+	int		i;
+	int		j;
 
-	i = 0;
+	i = 1;
 	while (av[++i])
 	{
-		if (bad_chars(av[i]) && !err_print(av[i], av[0]))
+		if ((av[i][0] == '=' || ft_isdigit(av[i][0]) || bad_chars(av[i]))
+			&& !err_print(av[i], av[1]))
 		{
+			errno = 1;
 			av_remove(av, i);
 			i -= 1;
-			errno = 1;
 		}
+		j = -1;
 	}
 }
+
+// void	err_finder(char **av)
+// {
+// 	int	i;
+
+// 	i = 0;
+// 	while (av[++i])
+// 	{
+// 		if (bad_chars(av[i]) && !err_print(av[i], av[0]))
+// 		{
+// 			av_remove(av, i);
+// 			i -= 1;
+// 			errno = 1;
+// 		}
+// 	}
+// }
 
 int	env_cmp(char *arg, char *env, char *shell_name)
 {
