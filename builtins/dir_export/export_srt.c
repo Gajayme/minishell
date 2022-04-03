@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   export_srt.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lyubov <lyubov@student.42.fr>              +#+  +:+       +#+        */
+/*   By: gajayme <gajayme@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/13 16:11:46 by lyubov            #+#    #+#             */
-/*   Updated: 2022/04/03 14:56:12 by lyubov           ###   ########.fr       */
+/*   Updated: 2022/04/03 16:47:28 by gajayme          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,12 +57,11 @@ void	no_args(char **env)
 	int		counter;
 
 	i = -1;
-	//env_srt(env);
+	env_srt(env);
 	while (env[++i])
 	{
 		j = -1;
 		counter = 0;
-		//printf("\n\n%s\n\n", env[i]);
 		while (env[i][++j])
 		{
 			write(1, &env[i][j], 1);

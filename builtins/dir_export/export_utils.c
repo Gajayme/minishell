@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   export_utils.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lyubov <lyubov@student.42.fr>              +#+  +:+       +#+        */
+/*   By: gajayme <gajayme@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/12 18:58:50 by gajayme           #+#    #+#             */
-/*   Updated: 2022/04/03 14:48:35 by lyubov           ###   ########.fr       */
+/*   Updated: 2022/04/03 16:59:17 by gajayme          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,5 +63,18 @@ int	err_print(char *arg, char *shell_name)
 	ft_putstr_fd(": export: `", 2);
 	ft_putstr_fd(arg, 2);
 	ft_putstr_fd("': not a valid identifier\n", 2);
+	return (0);
+}
+
+int	up_putendl_fd(char *s, int fd)
+{
+	if (!s)
+		return (0);
+	while (*s)
+	{
+		write(fd, s, 1);
+		s += 1;
+	}
+	write(fd, "\n", 1);
 	return (0);
 }

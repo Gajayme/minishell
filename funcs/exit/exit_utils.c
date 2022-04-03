@@ -6,7 +6,7 @@
 /*   By: gajayme <gajayme@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/26 20:34:13 by gajayme           #+#    #+#             */
-/*   Updated: 2022/03/26 22:06:49 by gajayme          ###   ########.fr       */
+/*   Updated: 2022/04/03 19:18:09 by gajayme          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,16 +74,6 @@ int	get_len(char **av)
 
 	i = 0;
 	while (av[i])
-		i += 1;
-	return (i);
-}
-
-size_t	ft_strlen(const char *str)
-{
-	size_t	i;
-
-	i = 0;
-	while (str[i])
 		i += 1;
 	return (i);
 }
