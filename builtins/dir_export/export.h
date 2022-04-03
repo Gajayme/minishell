@@ -6,7 +6,7 @@
 /*   By: lyubov <lyubov@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/12 18:59:42 by gajayme           #+#    #+#             */
-/*   Updated: 2022/03/31 18:25:00 by lyubov           ###   ########.fr       */
+/*   Updated: 2022/04/03 00:43:34 by lyubov           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@
 # include <errno.h>
 # include "../../libft/libft.h"
 
-//main_file
+//main_filecd
 void		stop(char *shell_name);
 void		final_print(char **av);
 void		distributor(char **av, char **env);

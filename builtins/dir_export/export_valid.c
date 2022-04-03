@@ -6,7 +6,7 @@
 /*   By: lyubov <lyubov@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/17 00:45:14 by lyubov            #+#    #+#             */
-/*   Updated: 2022/03/31 18:35:36 by lyubov           ###   ########.fr       */
+/*   Updated: 2022/04/03 01:04:04 by lyubov           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,17 +45,15 @@ void	validator(char **av)
 	int		i;
 	int		j;
 	char	**words;
-
+	//imhere
 	i = 1;
 	while (av[++i])
 	{
 		words = ft_split(av[i], '=');
 		if (!words)
-		{
 			stop(av[0]);
-		}
-		if ((bad_chars(words[0]) || av[i][0] == '=')
-				&& !err_print(av[i], av[0]))
+		if ((bad_chars(words[0]) || av[i][0] == '=' || ft_isdigit(av[i][0])
+				|| av[i][0] == '=') && !err_print(av[i], av[0]))
 		{
 			errno = 1;
 			av_remove(av, i);
