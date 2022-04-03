@@ -26,6 +26,8 @@ $(NAME): $(OBJ) $(INC)
 	@echo "making unset..."
 	@$(CC) $(OBJ) $(LIBFT_INC) -o $(NAME)
 	@echo "unset is made >_<"
+	cp unset ../
+
 %.o : %.c
 	@$(CC) $(CFLAGS) -c $< -o $@ -MD
 

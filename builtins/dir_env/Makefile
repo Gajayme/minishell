@@ -27,6 +27,7 @@ $(NAME): $(OBJ) $(INC)
 	@echo "making env..."
 	@$(CC) $(OBJ) $(LIBFT_INC) -o $(NAME)
 	@echo "env is made >_<"
+	cp env ../
 %.o : %.c
 	@$(CC) $(CFLAGS) -c $< -o $@ -MD
 

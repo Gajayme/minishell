@@ -19,7 +19,8 @@ $(NAME): $(OBJ)
 	@echo "making pwd..."
 	@$(CC) $(OBJ) -o $(NAME)
 	@echo "pwd is made >_<"
-
+	cp pwd ../
+	
 %.o : %.c
 	@$(CC) $(CFLAGS) -c $< -o $@ -MD
 

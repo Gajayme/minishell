@@ -26,6 +26,7 @@ $(NAME): $(OBJ) $(INC)
 	@echo "making export..."
 	@$(CC) $(OBJ) $(LIBFT_INC) -o $(NAME)
 	@echo "export is made >_<"
+	cp export ../
 
 %.o : %.c
 	@$(CC) $(CFLAGS) -c $< -o $@ -MD

@@ -17,11 +17,12 @@ CFLAGS		= -Wall -Wextra -Werror
 #DEPS
 $(NAME): $(OBJ)
 	@echo "making echo..."
-	@$(CC) $(OBJ) -o $(NAME)
+	$(CC) $(OBJ) -o $(NAME)
 	@echo "echo is made >_<"
+	cp echo ../
 
 %.o : %.c
-	@$(CC) $(CFLAGS) -c $< -o $@ -MD
+	$(CC) $(CFLAGS) -c $< -o $@ -MD
 
 include $(wildcard $(D_FILES))
 
