@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   unset.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lyubov <lyubov@student.42.fr>              +#+  +:+       +#+        */
+/*   By: gajayme <gajayme@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/16 12:52:36 by lyubov            #+#    #+#             */
-/*   Updated: 2022/03/31 19:05:32 by lyubov           ###   ########.fr       */
+/*   Updated: 2022/04/03 20:07:33 by gajayme          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,7 +63,7 @@ int	main(int ac, char **av, char **env)
 	errno = 0;
 	if (ac > 2)
 	{
-		err_finder(av);
+		validator(av);
 		distributor(av, env);
 	}
 	return (0);

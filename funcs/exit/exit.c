@@ -6,13 +6,13 @@
 /*   By: dcelsa <dcelsa@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/21 19:42:30 by gajayme           #+#    #+#             */
-/*   Updated: 2022/04/03 00:52:35 by dcelsa           ###   ########.fr       */
+/*   Updated: 2022/04/03 21:19:45 by dcelsa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "exit.h"
 
-int	digit_checker(char *arg, char *shell_name)
+int	digit_checker(char *arg, char *shell_name, int fd_exit)
 {
 	int	i;
 
@@ -22,12 +22,12 @@ int	digit_checker(char *arg, char *shell_name)
 		if (i == 0 && arg[i] == '-')
 			continue ;
 		else if ((arg[i] < 48 || arg[i] > 57) && !err_printer(arg, shell_name))
-			exit(255);
+			exiting(255, fd_exit);
 	}
 	return (0);
 }
 
-int	overflow_checker(char *arg, char *shell_name)
+int	overflow_checker(char *arg, char *shell_name, int fd_exit)
 {
 	unsigned long	max;
 	unsigned long	num;
@@ -37,29 +37,29 @@ int	overflow_checker(char *arg, char *shell_name)
 	if ((ft_strlen(arg) > 20 || ((num > max && *arg != '-')
 				|| (num > max + 1 && *arg == '-')))
 		&& !err_printer(arg, shell_name))
-		exit (255);
+		exiting(255, fd_exit);
 	else
 		return (0);
 }
 
-int	err_printer(char *arg, char *shell_name)
+void	exiting(int code, int fd_exit)
 {
-	up_putstr_fd("exit\n", 2);
-	up_putstr_fd(shell_name, 2);
-	up_putstr_fd(": exit ", 2);
-	up_putstr_fd(arg, 2);
-	up_putstr_fd(": numeric argument required\n", 2);
-	return (0);
+	char	*str;
+
+	str = ft_itoa(code);
+	ft_putendl_fd(str, fd_exit);
+	free(str);
+	exit(code);
 }
 
-int	ft_exit(char *shell_name, char **av)
+int	ft_exit(char *shell_name, int fd_exit, char **av)
 {
 	if (get_len(av) == 1 || (get_len(av) > 1 && av[1][0] == '#'))
-		exit(0);
-	else if (get_len(av) <= 2 && !digit_checker(av[1], shell_name)
-		&& !overflow_checker(av[1], shell_name))
-		exit(up_atoi(av[1]));
-	else if (get_len(av) > 2 && !digit_checker(av[1], shell_name))
+		exiting(0, fd_exit);
+	else if (get_len(av) <= 2 && !digit_checker(av[1], shell_name, fd_exit)
+		&& !overflow_checker(av[1], shell_name, fd_exit))
+		exeting(up_atoi(av[1]));
+	else if (get_len(av) > 2 && !digit_checker(av[1], shell_name, fd_exit))
 	{
 		up_putstr_fd("exit\n", 2);
 		up_putstr_fd(shell_name, 2);

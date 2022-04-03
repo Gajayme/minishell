@@ -6,7 +6,7 @@
 /*   By: dcelsa <dcelsa@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/08 17:00:11 by gajayme           #+#    #+#             */
-/*   Updated: 2022/04/02 15:00:19 by dcelsa           ###   ########.fr       */
+/*   Updated: 2022/04/03 21:19:56 by dcelsa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,18 +51,18 @@ void	distributor(char **av, char **env)
 		flag = 0;
 		while (av[++j])
 		{
-			flag = 0;
-			if (!env_cmp(env[i], av[j], av[0]))
+			if (!env_cmp(env[i], av[j], av[1]) && ft_strchr(av[j], '='))
 			{
-				printf("%s\n", av[j]);
+				up_putendl_fd(av[j], 1);
 				av_remove(av, j);
 				flag = 1;
+				break ;
 			}
-			else
-				continue ;
+			else if (!env_cmp(env[i], av[j], av[1]))
+				av_remove(av, j);
 		}
 		if (!flag)
-			printf("%s\n", env[i]);
+			up_putendl_fd(env[i], 1);
 	}
 }
 
@@ -74,6 +74,8 @@ int	main(int ac, char **av, char **env)
 	else
 	{
 		validator(av);
+		if (ac > 3)
+			remove_duplicate(av);
 		distributor(av, env);
 	}
 	final_print(av);
