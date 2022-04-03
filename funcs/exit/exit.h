@@ -6,7 +6,7 @@
 /*   By: gajayme <gajayme@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/26 20:34:23 by gajayme           #+#    #+#             */
-/*   Updated: 2022/04/03 20:54:07 by gajayme          ###   ########.fr       */
+/*   Updated: 2022/04/03 21:48:42 by gajayme          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,7 @@
 # include "../../libft/libft.h"
 
 //main
+void			exiting(int code, int fd_exit);
 int				digit_checker(char *arg, char *shell_name, int fd_exit);
 int				overflow_checker(char *arg, char *shell_name, int fd_exit);
 int				err_printer(char *arg, char *shell_name);

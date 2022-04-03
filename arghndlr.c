@@ -93,7 +93,7 @@ static void	addprogname(char *cmd, char *prog, t_list **args,
 void	builtinhndlr(t_cmd *cmd, t_head *head, t_bool *isbuiltin)
 {
 	if (!ft_strncmp(cmd->args->content, "exit", -1))
-		ft_exit(head->prog, cmdarr(cmd->args));
+		ft_exit(head->prog, head->fds.ex[1], cmdarr(cmd->args));
 	if (!ft_strncmp(cmd->args->content, "cd", -1))
 	{
 		if (ft_lstsize(cmd->args) > 1)

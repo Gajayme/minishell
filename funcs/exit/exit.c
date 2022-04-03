@@ -6,7 +6,7 @@
 /*   By: dcelsa <dcelsa@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/21 19:42:30 by gajayme           #+#    #+#             */
-/*   Updated: 2022/04/03 21:19:45 by dcelsa           ###   ########.fr       */
+/*   Updated: 2022/04/03 21:53:38 by dcelsa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,8 +38,7 @@ int	overflow_checker(char *arg, char *shell_name, int fd_exit)
 				|| (num > max + 1 && *arg == '-')))
 		&& !err_printer(arg, shell_name))
 		exiting(255, fd_exit);
-	else
-		return (0);
+	return (0);
 }
 
 void	exiting(int code, int fd_exit)
@@ -58,7 +57,7 @@ int	ft_exit(char *shell_name, int fd_exit, char **av)
 		exiting(0, fd_exit);
 	else if (get_len(av) <= 2 && !digit_checker(av[1], shell_name, fd_exit)
 		&& !overflow_checker(av[1], shell_name, fd_exit))
-		exeting(up_atoi(av[1]));
+		exiting(up_atoi(av[1]), fd_exit);
 	else if (get_len(av) > 2 && !digit_checker(av[1], shell_name, fd_exit))
 	{
 		up_putstr_fd("exit\n", 2);

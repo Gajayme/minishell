@@ -1,36 +1,46 @@
+#DEPS
+
+INC = $(wildcard */*.h)
+SRC = $(wildcard */*.c)
+
 #RULES
-all:
-	@cd ./dir_echo && make all && mv echo ../echo
-	@cd ./dir_env && make all && mv env ../env
-	@cd ./dir_export && make all && mv export ../export
-	@cd ./dir_pwd && make all && mv pwd ../pwd
-	@cd ./dir_unset && make all && mv unset ../unset
+all: $(INC) $(SRC)
+	@$(MAKE) -C ./dir_echo
+	@$(MAKE) -C ./dir_env
+	@$(MAKE) -C ./dir_export
+	@$(MAKE) -C ./dir_pwd
+	@$(MAKE) -C ./dir_unset
 
 clean:
-	@cd ./dir_echo && make clean
-	@cd ./dir_env && make clean
-	@cd ./dir_export && make clean
-	@cd ./dir_pwd && make clean
-	@cd ./dir_unset && make clean
+	@$(MAKE) -C ./dir_echo clean
+	@$(MAKE) -C ./dir_env clean
+	@$(MAKE) -C ./dir_export clean
+	@$(MAKE) -C ./dir_pwd clean
+	@$(MAKE) -C ./dir_unset clean
 
 fclean:
-	@cd ./dir_echo && make clean
+	@$(MAKE) -C ./dir_echo fclean
+	@$(MAKE) -C ./dir_env fclean
+	@$(MAKE) -C ./dir_export fclean
+	@$(MAKE) -C ./dir_pwd fclean
+	@$(MAKE) -C ./dir_unset fclean
 	@rm -f echo
-	@cd ./dir_env && make fclean
 	@rm -f env
-	@cd ./dir_export && make fclean
 	@rm -f export
-	@cd ./dir_pwd && make fclean
 	@rm -f pwd
-	@cd ./dir_unset && make fclean
 	@rm -f unset
 
-re:
-	@cd ./dir_echo && make re && mv echo ../echo
-	@cd ./dir_env && make re && mv env ../env
-	@cd ./dir_export && make re && mv export ../export
-	@cd ./dir_pwd && make re && mv pwd ../pwd
-	@cd ./dir_unset && make re && mv unset ../unset
+re: fclean
+	@rm -f echo
+	@rm -f env
+	@rm -f export
+	@rm -f pwd
+	@rm -f unset
+	@$(MAKE) -C ./dir_echo re
+	@$(MAKE) -C ./dir_env re
+	@$(MAKE) -C ./dir_export re
+	@$(MAKE) -C ./dir_pwd re
+	@$(MAKE) -C ./dir_unset re
 
 #OTHER
 .PHONY: all clean fclean re
