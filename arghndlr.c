@@ -52,7 +52,7 @@ void	arghndlr(t_list *args, t_list **argshead, t_head *head)
 	t_bounds	new;
 	t_bool		spl;
 
-	if (ft_strncmp(args->content, "export", -1)
+	if (args && ft_strncmp(args->content, "export", -1)
 		&& ft_strncmp(args->content, "unset", -1))
 	{
 		ft_lstadd_back(&head->fds.envfds, ft_lstnew(malloc(sizeof(int) * 2)));

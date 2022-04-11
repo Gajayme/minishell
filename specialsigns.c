@@ -6,7 +6,7 @@
 /*   By: dcelsa <dcelsa@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/02 15:54:16 by dcelsa            #+#    #+#             */
-/*   Updated: 2022/04/03 19:03:40 by dcelsa           ###   ########.fr       */
+/*   Updated: 2022/04/11 19:56:53 by dcelsa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,8 +32,8 @@ static void	specialfiller(char *crsr, t_head *head, t_list **exps, t_list *qtxt)
 	if (*line.begin == '$')
 		line.begin = dlrhndlr(line.begin, head, exps, qtxt);
 	else if (*line.begin == '~'
-		&& (istoken(line.begin + 1, " /") || !*(line.begin + 1))
-		&& (line.begin == head->cmd || *(line.begin - 1) == ' '))
+		&& (istoken(line.begin + 1, " /&?") || !*(line.begin + 1))
+		&& (line.begin == crsr || istoken(line.begin - 1, " &|")))
 	{
 		ft_lstadd_back(exps, ft_lstnew(malloc(sizeof(t_exp))));
 		expcast(ft_lstlast(*exps))->sns.begin = line.begin;

@@ -6,7 +6,7 @@
 /*   By: dcelsa <dcelsa@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/02 15:59:23 by dcelsa            #+#    #+#             */
-/*   Updated: 2022/04/03 19:18:16 by dcelsa           ###   ########.fr       */
+/*   Updated: 2022/04/11 20:08:03 by dcelsa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -89,7 +89,7 @@ static int	rdr(t_list *redirs, t_bool src, t_head *head)
 	while (redirs && fd != -1)
 	{
 		redir = rdrcast(redirs);
-		if (redir->src == src && fd && fd != 1)
+		if (redir->src == src && fd != (!src))
 			close(fd);
 		if (redir->src == src && redir->apporstdin && src)
 			fd = maninp(redir->florlmt);
@@ -108,22 +108,19 @@ static int	rdr(t_list *redirs, t_bool src, t_head *head)
 
 void	rdrhndlr(t_cmd	*cmd, t_fds *fds, t_head *head)
 {
-	char	*ncmd;
-
-	ncmd = cmd->args->content;
 	cmd->fd[0] = rdr(cmd->redirs, TRUE, head);
 	cmd->fd[1] = rdr(cmd->redirs, FALSE, head);
 	if (cmd->fd[1] != 1 && ((ft_lstsize(cmd->args) > 1
-				&& !ft_strncmp(ncmd, "export", -1))
-			|| !ft_strncmp(ncmd, "cd", -1)
-			|| !ft_strncmp(ncmd, "exit", -1)))
+				&& !ft_strncmp(cmd->args->content, "export", -1))
+			|| !ft_strncmp(cmd->args->content, "cd", -1)
+			|| !ft_strncmp(cmd->args->content, "exit", -1)))
 		close(cmd->fd[1]);
-	if ((ft_lstsize(cmd->args) > 1 && !ft_strncmp(ncmd, "export", -1))
-		|| !ft_strncmp(ncmd, "unset", -1))
+	if ((ft_lstsize(cmd->args) > 1 && !ft_strncmp(cmd->args->content, "export", -1))
+		|| !ft_strncmp(cmd->args->content, "unset", -1))
 		cmd->fd[1] = ((int *)ft_lstlast(fds->envfds)->content)[1];
-	if (!ft_strncmp(ncmd, "cd", -1))
+	if (!ft_strncmp(cmd->args->content, "cd", -1))
 		cmd->fd[1] = fds->path[1];
-	if (!ft_strncmp(ncmd, "exit", -1))
+	if (!ft_strncmp(cmd->args->content, "exit", -1))
 		cmd->fd[1] = fds->ex[1];
 	ft_lstclear(&cmd->redirs, &clearredirlst);
 }
