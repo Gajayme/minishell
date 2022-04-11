@@ -6,7 +6,7 @@
 /*   By: dcelsa <dcelsa@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/02 15:30:47 by dcelsa            #+#    #+#             */
-/*   Updated: 2022/04/03 20:52:11 by dcelsa           ###   ########.fr       */
+/*   Updated: 2022/04/09 00:03:59 by dcelsa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -87,19 +87,15 @@ char	*findenv(char *name, int size, t_head *head, t_bool quoted)
 	return (NULL);
 }
 
-char	*dlrhndlr(char *begin, t_head *head, t_list **exps, t_list *qtxt)
+char	*dlrhndlr(t_bounds word, t_head *head, t_list **exps, t_list *qtxt)
 {
-	t_bounds	word;
-
-	word.begin = begin;
-	word.end = word.begin + ft_strlen(word.begin);
 	word.end = symbdefiner(&word, "'\" *<>&|$?", qtxt);
 	if (word.end == word.begin
 		|| (istoken(word.end, " $") && word.end - 1 == word.begin))
 		return (word.end);
 	ft_lstadd_back(exps, ft_lstnew(malloc(sizeof(t_exp))));
 	expcast(ft_lstlast(*exps))->sns.begin = word.begin;
-	expcast(ft_lstlast(*exps))->sns.end = word.end + !istoken(word.end, "'\" *<>&|$");
+	expcast(ft_lstlast(*exps))->sns.end = word.end + (*word.end == '?');
 	word.begin++;
 	word.end -= istoken(word.end, "'\" *<>&|$") + (!*word.end);
 	(expcast(ft_lstlast(*exps))->val) = findenv(word.begin,

@@ -6,7 +6,7 @@
 /*   By: dcelsa <dcelsa@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/02 15:54:16 by dcelsa            #+#    #+#             */
-/*   Updated: 2022/04/03 19:03:40 by dcelsa           ###   ########.fr       */
+/*   Updated: 2022/04/11 18:11:06 by dcelsa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,87 +21,90 @@ char	*slash(char *end, char *home)
 	return (end);
 }
 
-static void	specialfiller(char *crsr, t_head *head, t_list **exps, t_list *qtxt)
+static void	specialfiller(t_bounds crsr, t_head *head, t_list **exps, t_list *qtxt)
 {
-	t_bounds	line;
-
-	line.begin = crsr;
-	line.end = crsr + ft_strlen(crsr);
-	if (!istoken(line.begin, "~$"))
-		line.begin = symbdefiner(&line, "~$", qtxt);
-	if (*line.begin == '$')
-		line.begin = dlrhndlr(line.begin, head, exps, qtxt);
-	else if (*line.begin == '~'
-		&& (istoken(line.begin + 1, " /") || !*(line.begin + 1))
-		&& (line.begin == head->cmd || *(line.begin - 1) == ' '))
+	if (!istoken(crsr.begin, "~$"))
+		crsr.begin = symbdefiner(&crsr, "~$", qtxt);
+	if (*crsr.begin == '$')
+		crsr.begin = dlrhndlr(crsr, head, exps, qtxt);
+	else if (*crsr.begin == '~'
+		&& (istoken(crsr.begin + 1, " /") || !*(crsr.begin + 1))
+		&& (*(crsr.begin - 1) == ' ' || !*(crsr.begin - 1)))
 	{
 		ft_lstadd_back(exps, ft_lstnew(malloc(sizeof(t_exp))));
-		expcast(ft_lstlast(*exps))->sns.begin = line.begin;
-		expcast(ft_lstlast(*exps))->sns.end = ++line.begin;
-		(expcast(ft_lstlast(*exps))->val) = slash(line.begin,
+		expcast(ft_lstlast(*exps))->sns.begin = crsr.begin;
+		expcast(ft_lstlast(*exps))->sns.end = ++crsr.begin;
+		(expcast(ft_lstlast(*exps))->val) = slash(crsr.begin,
 				findenv("HOME", ft_strlen("HOME"), head, FALSE));
+		while (*crsr.begin == '~')
+			crsr.begin++;
 	}
 	else
 		return ;
-	specialfiller(line.begin, head, exps, qtxt);
+	specialfiller(crsr, head, exps, qtxt);
 }
 
-static char	*newcmdbuilder(char *cmd, t_list *crsr, t_list *exps)
+static t_bounds	*newcmdbuilder(char *begin, char *end, int size, t_list *exps)
 {
-	char	*new;
-	char	*crs;
-	int		size;
+	t_bounds	*new;
 
-	size = ft_strlen(cmd);
+	new = malloc(sizeof(*new));
+	new->begin = ft_bzero(malloc(sizeof(*new->begin) * size), sizeof(*new->begin) * size);
+	while (exps)
+	{
+		if (begin != expcast(exps)->sns.begin)
+			ft_strlcat(new->begin, begin, expcast(exps)->sns.begin - begin + 1 + ft_strlen(new->begin));
+		begin = expcast(exps)->sns.end;
+		ft_strlcat(new->begin, expcast(exps)->val, ft_strlen(expcast(exps)->val) + 1 + ft_strlen(new->begin));
+		exps = exps->next;
+	}
+	if (*begin)
+		ft_strlcat(new->begin, begin, end - begin + 2 + ft_strlen(new->begin));
+	new->end = new->begin + ft_strlen(new->begin);
+	return (new);
+}
+
+t_bounds	*preparebuilding(t_bounds *src, t_bounds *word, t_list *expansions)
+{
+	t_bounds	*cmd;
+	t_list		*crsr;
+	int			size;
+
+	if (!expansions)
+		return (src);
+	size = src->end - src->begin + 1;
+	crsr = expansions;
 	while (crsr)
 	{
 		size += expcast(crsr)->sns.begin - expcast(crsr)->sns.end
 			+ ft_strlen(expcast(crsr)->val);
 		crsr = crsr->next;
 	}
-	new = ft_bzero(malloc(sizeof(*new) * size), size);
-	crs = new;
-	while (exps)
+	cmd = newcmdbuilder(src->begin, src->end, size, expansions);
+	if (src != word)
 	{
-		crs += ft_strlen(crs);
-		if (cmd != expcast(exps)->sns.begin)
-			ft_strlcpy(crs, cmd, expcast(exps)->sns.begin - cmd + 1);
-		crs += ft_strlen(crs);
-		cmd = expcast(exps)->sns.end;
-		ft_strlcat(crs, expcast(exps)->val, ft_strlen(expcast(exps)->val) + 1);
-		exps = exps->next;
+		free(src->begin);
+		free(src);
 	}
-	if (*cmd)
-		crs += ft_strlen(crs);
-	if (*cmd)
-		ft_strlcat(crs, cmd, ft_strlen(cmd) + 1);
-	return (new);
+	return (cmd);
 }
 
-char	*expandspecialsigns(char *oldcmd, t_head *head, t_list **qtxt)
+t_bounds	*expandspecialsigns(t_bounds *word, t_head *head, t_list **qtxt)
 {
-	t_list	*expansions;
-	char	*cmd[2];
+	t_list		*expansions;
+	t_bounds	*cmd;
 
-	*qtxt = NULL;
-	quotedtxt(oldcmd, head->prog, qtxt, FALSE);
 	expansions = NULL;
-	specialfiller(oldcmd, head, &expansions, *qtxt);
-	cmd[0] = oldcmd;
+	specialfiller(*word, head, &expansions, head->qtxt);
+	cmd = preparebuilding(word, word, expansions);
+	*qtxt = head->qtxt;
 	if (expansions)
-		cmd[0] = newcmdbuilder(oldcmd, expansions, expansions);
-	ft_lstclear(&expansions, &clearexp);
-	ft_lstclear(qtxt, &free);
-	*qtxt = NULL;
-	quotedtxt(cmd[0], head->prog, qtxt, FALSE);
-	wildcardhndlr(cmd[0], head, &expansions, *qtxt);
+		*qtxt = NULL;
 	if (expansions)
-	{
-		cmd[1] = newcmdbuilder(cmd[0], expansions, expansions);
-		if (cmd[0] != oldcmd)
-			free(cmd[0]);
-		cmd[0] = cmd[1];
-	}
+		quotedtxt(cmd->begin, NULL, qtxt);
 	ft_lstclear(&expansions, &clearexp);
-	return (cmd[0]);
+	wildcardhndlr(*cmd, head, &expansions, *qtxt);
+	cmd = preparebuilding(cmd, word, expansions);
+	ft_lstclear(&expansions, &clearexp);
+	return (cmd);
 }

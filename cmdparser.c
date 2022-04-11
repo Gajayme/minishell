@@ -6,7 +6,7 @@
 /*   By: dcelsa <dcelsa@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/02 15:59:47 by dcelsa            #+#    #+#             */
-/*   Updated: 2022/04/03 17:18:58 by dcelsa           ###   ########.fr       */
+/*   Updated: 2022/04/11 19:10:21 by dcelsa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,8 @@ static void	redirdefiner(t_bounds *cmd, t_list **redirs, t_list *qtxt)
 	rdr.end = cmd->end;
 	rdr.end = symbdefiner(&rdr, "<> |&", qtxt);
 	rdr.end -= istoken(rdr.end, "<> |&");
-	(rdrcast(ft_lstlast(*redirs))->florlmt) = txtcopy(&rdr, NULL, qtxt, TRUE);
+	rdrcast(ft_lstlast(*redirs))->word.begin = rdr.begin;
+	rdrcast(ft_lstlast(*redirs))->word.end = rdr.end;
 	rdr.begin = rdr.end + 1;
 	rdr.end = cmd->end;
 	if (rdr.begin >= rdr.end)
@@ -40,8 +41,7 @@ static void	redirdefiner(t_bounds *cmd, t_list **redirs, t_list *qtxt)
 
 static void	cmdbuilder(t_bounds *cmd, t_cmd *curcmd, t_list *qtxt)
 {
-	t_bounds	word;
-	t_bool		wastoken;
+	t_bool	wastoken;
 
 	curcmd->args = NULL;
 	redirdefiner(cmd, &curcmd->redirs, qtxt);
@@ -50,18 +50,18 @@ static void	cmdbuilder(t_bounds *cmd, t_cmd *curcmd, t_list *qtxt)
 	{
 		while (cmd->begin < cmd->end && *cmd->begin == ' ')
 			cmd->begin++;
-		wastoken = istoken(cmd->begin, STPSYMBS);
-		if (wastoken)
-			cmd->begin += 1 + (*(cmd->begin + 1) == *cmd->begin);
-		while (cmd->begin < cmd->end && *cmd->begin == ' ')
+		wastoken = istoken(cmd->begin, "<>");
+		cmd->begin += (1 + (*(cmd->begin + 1) == *cmd->begin)) * wastoken;
+		while (cmd->begin < cmd->end && istoken(cmd->begin, " ()"))
 			cmd->begin++;
-		word.begin = cmd->begin;
-		word.end = symbdefiner(cmd, "<> |&", qtxt);
-		word.end -= istoken(word.end, "<> |&") + (!*word.end);
-		cmd->begin = word.end + 1;
-		if (wastoken || (word.end - word.begin < 1 && *word.end == ' '))
+		if (wastoken)
+			cmd->begin = symbdefiner(cmd, "<> &|()", qtxt);
+		if (wastoken || cmd->begin == cmd->end)
 			continue ;
-		txtcopy(&word, &curcmd->args, qtxt, FALSE);
+		ft_lstadd_back(&curcmd->words, ft_lstnew(malloc(sizeof(t_bounds))));
+		boundcast(ft_lstlast(curcmd->words))->begin = cmd->begin;
+		boundcast(ft_lstlast(curcmd->words))->end = symbdefiner(cmd, "<> |&()", qtxt) - 1;
+		cmd->begin = boundcast(ft_lstlast(curcmd->words))->end + 1;
 	}
 }
 
@@ -71,6 +71,8 @@ static void	priordefiner(t_cmd *curcmd, t_bounds *cmd, char *cmds)
 	curcmd->lprior = '\0';
 	if (cmd->begin == cmds)
 		return ;
+	while (cmd->begin > cmds && !istoken(cmd->begin, "|&"))
+		cmd->begin--;
 	curcmd->ispipe += (*cmd->begin == '|' && *(cmd->begin - 1) != '|');
 	if ((*cmd->begin == '|' && *(cmd->begin - 1) == '|') || *cmd->begin == '&')
 		curcmd->lprior = *cmd->begin;
@@ -80,22 +82,23 @@ void	parser(t_head *head, t_list **cmdlst)
 {
 	t_bounds	cmd;
 	t_cmd		*curcmd;
-	t_list		*qtxt;
 
-	qtxt = NULL;
-	quotedtxt(head->cmd, head->prog, &qtxt, FALSE);
+	head->qtxt = NULL;
+	quotedtxt(head->cmd, NULL, &head->qtxt);
 	cmd.begin = head->cmd;
+	cmd.end = cmd.begin + ft_strlen(cmd.begin);
+	prnthsfiller(head->cmd, cmd, &head->prnths, head->qtxt);
 	while (cmd.begin < head->cmd + ft_strlen(head->cmd))
 	{
 		cmd.end = cmd.begin + ft_strlen(cmd.begin);
-		cmd.end = symbdefiner(&cmd, SYMBS, qtxt);
+		cmd.end = symbdefiner(&cmd, SYMBS, head->qtxt);
 		curcmd = malloc(sizeof(*curcmd));
 		curcmd->ispipe = FALSE;
 		priordefiner(curcmd, &cmd, head->cmd);
 		curcmd->redirs = NULL;
-		cmdbuilder(&cmd, curcmd, qtxt);
+		curcmd->words = NULL;
+		cmdbuilder(&cmd, curcmd, head->qtxt);
 		ft_lstadd_back(cmdlst, ft_lstnew(curcmd));
 		cmd.begin = cmd.end + (*cmd.end == *(cmd.end + 1));
 	}
-	ft_lstclear(&qtxt, &free);
 }

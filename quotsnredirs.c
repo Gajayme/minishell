@@ -6,13 +6,13 @@
 /*   By: dcelsa <dcelsa@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/02 15:59:23 by dcelsa            #+#    #+#             */
-/*   Updated: 2022/04/03 19:18:16 by dcelsa           ###   ########.fr       */
+/*   Updated: 2022/04/11 18:50:28 by dcelsa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-void	quotedtxt(char *cmd, char *prog, t_list **qtxt, t_bool vldmod)
+void	quotedtxt(char *cmd, char *prog, t_list **qtxt)
 {
 	t_bounds	*qt;
 	t_bounds	quots;
@@ -26,8 +26,8 @@ void	quotedtxt(char *cmd, char *prog, t_list **qtxt, t_bool vldmod)
 	quots.end = ft_strchr(quots.begin + 1, *quots.begin);
 	if (!quots.end)
 		parserr(prog, quots.begin + ft_strlen(quots.begin) - 1);
-	quotedtxt(quots.end + 1, prog, qtxt, vldmod);
-	if (vldmod)
+	quotedtxt(quots.end + 1, prog, qtxt);
+	if (prog)
 		return ;
 	qt = malloc(sizeof(*qt));
 	qt->begin = quots.begin;
@@ -57,33 +57,32 @@ t_bool	outqt(char *str, t_list *qtxt, t_bool strict)
 
 static char	*specialhndlr(t_bounds *dlr, t_head *head)
 {
-	t_bounds	new;
+	t_bounds	*new;
 	t_list		*qtxt;
+	char		*cdlr;
 	char		**ref;
 
-	new.begin = expandspecialsigns(dlr->begin, head, &qtxt);
-	new.end = new.begin + ft_strlen(new.begin) - 1;
-	new.end = txtcopy(&new, NULL, qtxt, TRUE);
-	free(new.begin);
-	new.begin = new.end;
-	new.end = dlr->begin;
-	if (!istoken(new.end, "$*"))
-		new.end = symbdefiner(dlr, "$*", qtxt);
-	new.end -= (!*new.end);
-	ref = ft_split(new.begin, ' ');
-	if (((*new.end == '$' && outqt(new.end, qtxt, TRUE)) || *new.end == '*')
-		&& arrsize(ref) > 1)
+	qtxt = NULL;
+	new = expandspecialsigns(dlr, head, &qtxt);
+	if (new == dlr)
+		return (txtcopy(dlr, NULL, qtxt));
+	cdlr = symbdefiner(dlr, "$*", qtxt);
+	if (!istoken(cdlr, "$*") || (*cdlr == '$' && !outqt(cdlr, qtxt, TRUE)))
+		return (txtcopy(dlr, NULL, qtxt));
+	ref = ft_split(new->begin, ' ');
+	if (arrsize(ref) > 1)
 		redirerr(head->prog, dlr->begin);
-	eraser(ref);
-	ft_lstclear(&qtxt, &free);
-	return (new.begin);
+	if (eraser(ref) && qtxt != head->qtxt)
+		ft_lstclear(&qtxt, &free);
+	cdlr = new->begin;
+	free(new);
+	return (cdlr);
 }
 
 static int	rdr(t_list *redirs, t_bool src, t_head *head)
 {
 	int			fd;
 	t_redir		*redir;
-	t_bounds	file;
 
 	fd = (!src);
 	while (redirs && fd != -1)
@@ -95,9 +94,7 @@ static int	rdr(t_list *redirs, t_bool src, t_head *head)
 			fd = maninp(redir->florlmt);
 		else if (redir->src == src)
 		{
-			file.begin = redir->florlmt;
-			file.end = file.begin + ft_strlen(file.begin);
-			redir->florlmt = specialhndlr(&file, head);
+			redir->florlmt = specialhndlr(&redir->word, head);
 			fd = file_check(redir->florlmt, R_OK * src + W_OK * (!src),
 					redir->apporstdin, head->prog);
 		}
@@ -106,24 +103,29 @@ static int	rdr(t_list *redirs, t_bool src, t_head *head)
 	return (fd);
 }
 
-void	rdrhndlr(t_cmd	*cmd, t_fds *fds, t_head *head)
+void	rdrhndlr(t_cmd	*cmd, t_prnths *prnth, t_fds *fds, t_head *head)
 {
-	char	*ncmd;
-
-	ncmd = cmd->args->content;
+	if (prnth)
+	{
+		prnth->fd[0] = rdr(prnth->redirs, TRUE, head);
+		prnth->fd[1] = rdr(prnth->redirs, FALSE, head);
+		ft_lstclear(&prnth->redirs, &clearredirlst);
+		return ;
+	}
 	cmd->fd[0] = rdr(cmd->redirs, TRUE, head);
 	cmd->fd[1] = rdr(cmd->redirs, FALSE, head);
-	if (cmd->fd[1] != 1 && ((ft_lstsize(cmd->args) > 1
-				&& !ft_strncmp(ncmd, "export", -1))
-			|| !ft_strncmp(ncmd, "cd", -1)
-			|| !ft_strncmp(ncmd, "exit", -1)))
-		close(cmd->fd[1]);
-	if ((ft_lstsize(cmd->args) > 1 && !ft_strncmp(ncmd, "export", -1))
-		|| !ft_strncmp(ncmd, "unset", -1))
-		cmd->fd[1] = ((int *)ft_lstlast(fds->envfds)->content)[1];
-	if (!ft_strncmp(ncmd, "cd", -1))
-		cmd->fd[1] = fds->path[1];
-	if (!ft_strncmp(ncmd, "exit", -1))
-		cmd->fd[1] = fds->ex[1];
 	ft_lstclear(&cmd->redirs, &clearredirlst);
+	if (cmd->fd[1] != 1 && ((ft_lstsize(cmd->args) > 1
+				&& !ft_strncmp(cmd->args->content, "export", -1))
+			|| !ft_strncmp(cmd->args->content, "cd", -1)
+			|| !ft_strncmp(cmd->args->content, "exit", -1)))
+		close(cmd->fd[1]);
+	if (ft_lstsize(cmd->args) > 1
+		&& (!ft_strncmp(cmd->args->content, "export", -1)
+		|| !ft_strncmp(cmd->args->content, "unset", -1)))
+		cmd->fd[1] = ((int *)ft_lstlast(fds->envfds)->content)[1];
+	if (!ft_strncmp(cmd->args->content, "cd", -1))
+		cmd->fd[1] = fds->path[1];
+	if (!ft_strncmp(cmd->args->content, "exit", -1))
+		cmd->fd[1] = fds->ex[1];
 }

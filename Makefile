@@ -45,7 +45,7 @@ $(NAME):	$(HEADS) $(LIB) $(OBJS) $(BLTIN)
 $(BLTIN):	bltin
 
 bltin:
-			$(MAKE) -C $(BLTIN)
+			@$(MAKE) -C $(BLTIN)
 
 all:		$(NAME)
 

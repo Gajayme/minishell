@@ -6,7 +6,7 @@
 /*   By: dcelsa <dcelsa@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/02 16:34:31 by dcelsa            #+#    #+#             */
-/*   Updated: 2022/04/03 21:17:10 by dcelsa           ###   ########.fr       */
+/*   Updated: 2022/04/03 22:08:21 by dcelsa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -92,5 +92,5 @@ char	*shellinit(t_head *head, char *argv)
 	head->prog = argv;
 	if (ft_strrchr(argv, '/'))
 		head->prog = ft_strrchr(argv, '/') + 1;
-	return (ft_strjoin(head->prog, "> "));
+	return (ft_strjoin(head->prog, "$ "));
 }

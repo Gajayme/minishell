@@ -6,7 +6,7 @@
 /*   By: dcelsa <dcelsa@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/02 16:01:52 by dcelsa            #+#    #+#             */
-/*   Updated: 2022/04/03 21:14:58 by dcelsa           ###   ########.fr       */
+/*   Updated: 2022/04/08 18:37:44 by dcelsa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,34 +58,36 @@ static void	grand_finale(int pidcount, pid_t *pids, t_head *head, t_list *args)
 		writecdpath(head, args, head->referr);
 }
 
-t_bool	skippedcmd(int referr, t_list **crsr, t_list *cmdlst)
+t_bool	skippedcmd(int referr, t_list **crsr, t_list *prnths)
 {
 	char	ref;
 
 	ref = '&' * (!!referr) + '|' * (!referr);
-	if (!(*crsr) || cmdcast(*crsr)->lprior != ref || *crsr == cmdlst)
+	if (!(*crsr) || cmdcast(*crsr)->lprior != ref)
 		return (FALSE);
 	while (*crsr
-		&& (cmdcast(*crsr)->lprior == ref || cmdcast(*crsr)->ispipe))
+		&& (cmdcast(*crsr)->lprior == ref
+		|| cmdcast(*crsr)->ispipe
+		|| inprnths(boundcast(cmdcast(*crsr)->words)->begin, prnths)))
 		*crsr = (*crsr)->next;
 	return (TRUE);
 }
 
-static int	pipehndlr(t_head *head, t_list **crsr, t_list *cmdlst)
+int	pipehndlr(t_head *head)
 {
 	pid_t	*pids;
 	int		pipecmds;
 	int		nullfd[2];
 
-	if (skippedcmd(head->referr, crsr, cmdlst))
+	if (skippedcmd(head->referr, &head->crsr, head->prnths))
 		return (head->referr);
 	pipecmds = 0;
 	head->pipe = NULL;
-	while (*crsr && ++pipecmds)
+	while (head->crsr && ++pipecmds)
 	{
-		ft_lstadd_back(&head->pipe, ft_lstnew((*crsr)->content));
-		*crsr = (*crsr)->next;
-		if (!*crsr || !cmdcast(*crsr)->ispipe)
+		ft_lstadd_back(&head->pipe, ft_lstnew((head->crsr)->content));
+		head->crsr = head->crsr->next;
+		if (!head->crsr || !cmdcast(head->crsr)->ispipe)
 			break ;
 	}
 	pids = ft_bzero(malloc(sizeof(*pids) * pipecmds), sizeof(*pids) * pipecmds);
@@ -113,7 +115,6 @@ void	handlecmd(t_head *head, int *stat_loc)
 {
 	pid_t	pid;
 	t_list	*cmdlst;
-	t_list	*crsr;
 
 	if (!pipe(head->fds.path) && !pipe(head->fds.env) && !pipe(head->fds.issig))
 		pipe(head->fds.ex);
@@ -127,11 +128,9 @@ void	handlecmd(t_head *head, int *stat_loc)
 		cmdlst = NULL;
 	parser(head, &cmdlst);
 	head->fds.envfds = NULL;
-	crsr = cmdlst;
-	while (crsr)
-		head->referr = pipehndlr(head, &crsr, cmdlst);
+	head->crsr = cmdlst;
+	while (head->crsr)
+		head->referr = pipehndlr(head);
 	rewriteenv(head->env, &head->fds);
-	ft_lstclear(&head->fds.envfds, &free);
-	ft_lstclear(&cmdlst, &clearcmdlst);
 	exit(head->referr);
 }

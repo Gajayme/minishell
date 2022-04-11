@@ -6,7 +6,7 @@
 /*   By: dcelsa <dcelsa@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/02 15:52:38 by dcelsa            #+#    #+#             */
-/*   Updated: 2022/04/03 18:29:31 by dcelsa           ###   ########.fr       */
+/*   Updated: 2022/04/09 00:55:55 by dcelsa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,7 +69,7 @@ static void	partbuilder(t_bounds *word, t_list **parts, t_list *qtxt)
 	bounds.end = symbdefiner(word, "*", qtxt);
 	bounds.end -= istoken(bounds.end, "*") + (!*bounds.end);
 	if (*bounds.begin != '*')
-		ft_lstadd_back(parts, ft_lstnew(txtcopy(&bounds, NULL, qtxt, TRUE)));
+		ft_lstadd_back(parts, ft_lstnew(txtcopy(&bounds, NULL, qtxt)));
 	else
 		ft_lstadd_back(parts, ft_lstnew(NULL));
 	bounds.end += istoken(bounds.end + 1, "*") + (!*(bounds.end + 1));
@@ -115,18 +115,17 @@ static char	*filedef(t_bounds *word, char *cwd, t_list *qtxt)
 	return (compileentries(&entries, 0));
 }
 
-void	wildcardhndlr(char *crsr, t_head *head, t_list **exps, t_list *qtxt)
+void	wildcardhndlr(t_bounds cmd, t_head *head, t_list **exps, t_list *qtxt)
 {
-	t_bounds	cmd;
+	char	*end;
 
-	cmd.begin = crsr;
-	cmd.end = cmd.begin + ft_strlen(cmd.begin);
 	if (*cmd.begin != '*')
 		cmd.begin = symbdefiner(&cmd, "*", qtxt);
 	if (*cmd.begin != '*')
 		return ;
-	while (cmd.begin > crsr && !istoken(cmd.begin - 1, "&|<> "))
+	while (!istoken(cmd.begin - 1, "&|<> ()"))
 		cmd.begin--;
+	end = cmd.end;
 	cmd.end = symbdefiner(&cmd, "&|<> ", qtxt);
 	ft_lstadd_back(exps, ft_lstnew(malloc(sizeof(t_exp))));
 	cmd.end -= !*cmd.end;
@@ -135,5 +134,7 @@ void	wildcardhndlr(char *crsr, t_head *head, t_list **exps, t_list *qtxt)
 	expcast(ft_lstlast(*exps))->sns.end = ++cmd.end;
 	if (!expcast(ft_lstlast(*exps))->val)
 		expcast(ft_lstlast(*exps))->sns.end = cmd.begin;
-	wildcardhndlr(cmd.end, head, exps, qtxt);
+	cmd.begin = cmd.end;
+	cmd.end = end;
+	wildcardhndlr(cmd, head, exps, qtxt);
 }

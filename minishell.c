@@ -6,7 +6,7 @@
 /*   By: dcelsa <dcelsa@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/02 16:35:07 by dcelsa            #+#    #+#             */
-/*   Updated: 2022/04/03 21:15:50 by dcelsa           ###   ########.fr       */
+/*   Updated: 2022/04/04 00:07:47 by dcelsa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,6 +29,7 @@ void	readenv(t_list **env, char *path, char *envpath, int envfd)
 			ft_lstadd_back(env, ft_lstnew(ft_strjoin(ret, envpath)));
 		else
 			ft_lstadd_back(env, ft_lstnew(ft_strdup(ret)));
+		free(ret);
 		ret = get_next_line(envfd);
 	}
 	free(envpath);
@@ -80,8 +81,7 @@ void	handleexeptions(t_head *head)
 	if (buf)
 	{
 		free(buf);
-		if (ft_atoi(buf))
-			exit(0);
+		exit(ft_atoi(buf));
 	}
 	close(head->fds.ex[0]);
 }
