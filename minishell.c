@@ -6,7 +6,7 @@
 /*   By: dcelsa <dcelsa@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/02 16:35:07 by dcelsa            #+#    #+#             */
-/*   Updated: 2022/04/03 21:15:50 by dcelsa           ###   ########.fr       */
+/*   Updated: 2022/04/11 21:43:58 by dcelsa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,7 +63,8 @@ void	handleexeptions(t_head *head)
 {
 	char	*buf;
 
-	readenv(&head->env, head->path, ft_strjoin(":", head->path), head->fds.env[0]);
+	readenv(&head->env, head->path, ft_strjoin(":", head->path),
+		head->fds.env[0]);
 	mainproccd(head->fds.path[0], head->prog, &head->env);
 	buf = get_next_line(head->fds.issig[0]);
 	while (buf)
@@ -78,11 +79,7 @@ void	handleexeptions(t_head *head)
 	close(head->fds.issig[0]);
 	buf = get_next_line(head->fds.ex[0]);
 	if (buf)
-	{
-		free(buf);
-		if (ft_atoi(buf))
-			exit(0);
-	}
+		exit(ft_atoi(buf));
 	close(head->fds.ex[0]);
 }
 

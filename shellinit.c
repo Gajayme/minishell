@@ -6,7 +6,7 @@
 /*   By: dcelsa <dcelsa@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/02 16:34:31 by dcelsa            #+#    #+#             */
-/*   Updated: 2022/04/03 21:17:10 by dcelsa           ###   ########.fr       */
+/*   Updated: 2022/04/11 21:43:38 by dcelsa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,7 +37,8 @@ static void	rememberpath(char **path, char *argv)
 	if (ft_strchr(argv, '/'))
 	{
 		dirpath = malloc(sizeof(*dirpath) * (ft_strchr(argv, '/') - argv));
-		ft_strlcat(ft_bzero(dirpath, ft_strchr(argv, '/') - argv), argv, ft_strchr(argv, '/') - argv + 1);
+		ft_strlcat(ft_bzero(dirpath, ft_strchr(argv, '/') - argv), argv,
+			ft_strchr(argv, '/') - argv + 1);
 		cd(ft_strrchr(argv, '/') + 1, dirpath, NULL);
 		free(dirpath);
 		newdir = getcwd(NULL, 0);

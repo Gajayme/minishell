@@ -6,7 +6,7 @@
 /*   By: dcelsa <dcelsa@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/02 15:30:47 by dcelsa            #+#    #+#             */
-/*   Updated: 2022/04/03 20:52:11 by dcelsa           ###   ########.fr       */
+/*   Updated: 2022/04/11 21:54:57 by dcelsa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -84,7 +84,7 @@ char	*findenv(char *name, int size, t_head *head, t_bool quoted)
 			return (arrjoiner(ft_split(crsr->content + ++size, ' ')));
 		crsr = crsr->next;
 	}
-	return (NULL);
+	return (ft_strdup(""));
 }
 
 char	*dlrhndlr(char *begin, t_head *head, t_list **exps, t_list *qtxt)
@@ -99,7 +99,8 @@ char	*dlrhndlr(char *begin, t_head *head, t_list **exps, t_list *qtxt)
 		return (word.end);
 	ft_lstadd_back(exps, ft_lstnew(malloc(sizeof(t_exp))));
 	expcast(ft_lstlast(*exps))->sns.begin = word.begin;
-	expcast(ft_lstlast(*exps))->sns.end = word.end + !istoken(word.end, "'\" *<>&|$");
+	(expcast(ft_lstlast(*exps))->sns.end) = word.end
+		+ !istoken(word.end, "'\" *<>&|$");
 	word.begin++;
 	word.end -= istoken(word.end, "'\" *<>&|$") + (!*word.end);
 	(expcast(ft_lstlast(*exps))->val) = findenv(word.begin,

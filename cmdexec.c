@@ -6,7 +6,7 @@
 /*   By: dcelsa <dcelsa@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/02 16:01:52 by dcelsa            #+#    #+#             */
-/*   Updated: 2022/04/03 21:14:58 by dcelsa           ###   ########.fr       */
+/*   Updated: 2022/04/11 21:56:24 by dcelsa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,7 +38,8 @@ static void	grand_finale(int pidcount, pid_t *pids, t_head *head, t_list *args)
 
 	i = -1;
 	while (++i < pidcount)
-		error_handler(head->prog, NULL, waitpid(pids[i], &head->referr, WUNTRACED));
+		error_handler(head->prog, NULL, waitpid(pids[i],
+			&head->referr, WUNTRACED));
 	free(pids);
 	head->issig = WIFSIGNALED(head->referr);
 	num = ft_itoa(head->issig);

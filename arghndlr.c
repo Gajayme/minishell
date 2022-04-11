@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   arghndlr.c                                         :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: dcelsa <dcelsa@student.42.fr>              +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2022/04/11 21:44:13 by dcelsa            #+#    #+#             */
+/*   Updated: 2022/04/11 21:55:35 by dcelsa           ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "minishell.h"
 
 static void	argsexpander(t_list *arg, t_list **args, char *new, t_list *qtxt)
@@ -10,8 +22,13 @@ static void	argsexpander(t_list *arg, t_list **args, char *new, t_list *qtxt)
 	split = ft_split(new, ' ');
 	free(new);
 	i = arrsize(split);
+	if (!i)
+		arg->content = ft_strdup("");
+	if (!i)
+		return ;
 	bounds.begin = split[--i];
-	bounds.end = bounds.begin + ft_strlen(split[i]) - 1;
+	bounds.end = bounds.begin + ft_strlen(split[i])
+		- 1 * (ft_strlen(split[i]) > 0);
 	arg->content = txtcopy(&bounds, NULL, qtxt, TRUE);
 	crsr = arg;
 	while (--i >= 0)
@@ -52,8 +69,8 @@ void	arghndlr(t_list *args, t_list **argshead, t_head *head)
 	t_bounds	new;
 	t_bool		spl;
 
-	if (args && ft_strncmp(args->content, "export", -1)
-		&& ft_strncmp(args->content, "unset", -1))
+	if (ft_lstsize(args) > 1 && (!ft_strncmp(args->content, "export", -1)
+			|| !ft_strncmp(args->content, "unset", -1)))
 	{
 		ft_lstadd_back(&head->fds.envfds, ft_lstnew(malloc(sizeof(int) * 2)));
 		pipe(ft_lstlast(head->fds.envfds)->content);
@@ -93,7 +110,7 @@ static void	addprogname(char *cmd, char *prog, t_list **args,
 void	builtinhndlr(t_cmd *cmd, t_head *head, t_bool *isbuiltin)
 {
 	if (!ft_strncmp(cmd->args->content, "exit", -1))
-		ft_exit(head->prog, head->fds.ex[1], cmdarr(cmd->args));
+		exit(ft_exit(head->prog, head->fds.ex[1], cmdarr(cmd->args)));
 	if (!ft_strncmp(cmd->args->content, "cd", -1))
 	{
 		if (ft_lstsize(cmd->args) > 1)

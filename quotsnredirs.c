@@ -6,7 +6,7 @@
 /*   By: dcelsa <dcelsa@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/02 15:59:23 by dcelsa            #+#    #+#             */
-/*   Updated: 2022/04/11 20:08:03 by dcelsa           ###   ########.fr       */
+/*   Updated: 2022/04/11 21:36:25 by dcelsa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -115,7 +115,8 @@ void	rdrhndlr(t_cmd	*cmd, t_fds *fds, t_head *head)
 			|| !ft_strncmp(cmd->args->content, "cd", -1)
 			|| !ft_strncmp(cmd->args->content, "exit", -1)))
 		close(cmd->fd[1]);
-	if ((ft_lstsize(cmd->args) > 1 && !ft_strncmp(cmd->args->content, "export", -1))
+	if ((ft_lstsize(cmd->args) > 1
+			&& !ft_strncmp(cmd->args->content, "export", -1))
 		|| !ft_strncmp(cmd->args->content, "unset", -1))
 		cmd->fd[1] = ((int *)ft_lstlast(fds->envfds)->content)[1];
 	if (!ft_strncmp(cmd->args->content, "cd", -1))

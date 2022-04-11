@@ -6,7 +6,7 @@
 /*   By: dcelsa <dcelsa@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/04 19:57:04 by dcelsa            #+#    #+#             */
-/*   Updated: 2022/04/11 20:03:35 by dcelsa           ###   ########.fr       */
+/*   Updated: 2022/04/11 20:51:19 by dcelsa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,7 +60,7 @@ static int	executor(t_cmd *cmd, char **env, char *prog, t_bool isbuiltin)
 	buf = ft_strjoin("/", flags[isbuiltin]);
 	path = pathdefiner(buf, env);
 	free(buf);
-	if (!path)
+	if (!path || !*flags[isbuiltin])
 		return (cmdnotfound(prog, flags[isbuiltin]));
 	return (error_handler(prog, flags[isbuiltin], execve(path, flags, env)));
 }
