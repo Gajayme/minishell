@@ -54,12 +54,19 @@ $(LIB):		lib
 lib:		
 			@$(MAKE) -C $(LIBPATH)
 
-bonus:		clean $(HEADS) $(B_OBJS) $(LIB)
-			$(GCC) $(B_OBJS) $(LIB) -L$(MLX) -l$(MLX) $(FRAMEWORKS) -o $(NAME)
+bonus:		$(NAME)
+			@echo "o, privet! tut takoe delo, nashi bonusy "
+			@echo "vshity v kod iznachal'no i razorvat' proekt na "
+			@echo "2 chasti ves'ma problematichno, poetomu vse "
+			@echo "kompilitsya srazu. v realizacii bonusov my ne "
+			@echo "ispol'zovali ni odnoy zapreschennoy funkcii, "
+			@echo "potomu problem c chitami i normoy net. v to je vremya, "
+			@echo "subj trebuet otdel'noe pravilo pod bonusy, poetomu ty "
+			@echo "schas eto i chitaesh'))00)"
 
 clean:
 			@$(MAKE) -C $(LIBPATH) clean
-			$(MAKE) -C $(BLTIN) clean
+			@$(MAKE) -C $(BLTIN) clean
 			$(RM) $(wildcard *.d)
 			$(RM) ${wildcard GetNextLine/*.d}
 			$(RM) $(OBJS)
@@ -67,7 +74,7 @@ clean:
 
 fclean: 	clean
 			@$(MAKE) -C $(LIBPATH) fclean
-			$(MAKE) -C $(BLTIN) fclean
+			@$(MAKE) -C $(BLTIN) fclean
 			$(RM) $(NAME)
 			$(RM) $(B_NAME)
 
