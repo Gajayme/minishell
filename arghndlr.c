@@ -6,41 +6,38 @@
 /*   By: dcelsa <dcelsa@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/11 21:44:13 by dcelsa            #+#    #+#             */
-/*   Updated: 2022/04/11 21:55:35 by dcelsa           ###   ########.fr       */
+/*   Updated: 2022/04/16 14:30:51 by dcelsa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-static void	argsexpander(t_list *arg, t_list **args, char *new, t_list *qtxt)
+static t_bool	argsexpander(t_list *arg, t_list **args, char **split,
+	t_list *qtxt)
 {
-	char		**split;
 	t_list		*crsr;
 	t_bounds	bounds;
 	int			i;
 
-	split = ft_split(new, ' ');
-	free(new);
 	i = arrsize(split);
 	if (!i)
 		arg->content = ft_strdup("");
-	if (!i)
-		return ;
-	bounds.begin = split[--i];
-	bounds.end = bounds.begin + ft_strlen(split[i])
-		- 1 * (ft_strlen(split[i]) > 0);
-	arg->content = txtcopy(&bounds, NULL, qtxt, TRUE);
 	crsr = arg;
 	while (--i >= 0)
 	{
 		bounds.begin = split[i];
-		bounds.end = bounds.begin + ft_strlen(split[i]) - 1;
-		ft_lstadd_front(&crsr, ft_lstnew(txtcopy(&bounds, NULL, qtxt, TRUE)));
+		bounds.end = bounds.begin + ft_strlen(split[i])
+			- 1 * (ft_strlen(split[i]) > 0);
+		if (arrsize(split) - 1 == i)
+			arg->content = txtcopy(&bounds, NULL, qtxt);
+		else
+			ft_lstadd_front(&crsr, ft_lstnew(txtcopy(&bounds, NULL, qtxt)));
 	}
 	if (eraser(split) && *args == arg)
 		*args = crsr;
 	else
 		getprevstruct(*args, arg)->next = crsr;
+	return (TRUE);
 }
 
 static t_bool	needsplit(char *arg, char *prog)
@@ -82,10 +79,11 @@ void	arghndlr(t_list *args, t_list **argshead, t_head *head)
 		spl = needsplit(args->content, head->prog);
 		if (args->content != new.begin)
 			free(args->content);
-		if (spl)
-			argsexpander(args, argshead, new.begin, qtxt);
+		if (!(spl && argsexpander(args, argshead, ft_split(new.begin, ' '),
+					qtxt)))
+			args->content = txtcopy(&new, NULL, qtxt);
 		else
-			args->content = txtcopy(&new, NULL, qtxt, TRUE);
+			free(new.begin);
 		ft_lstclear(&qtxt, &free);
 		args = args->next;
 	}

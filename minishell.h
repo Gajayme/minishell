@@ -6,7 +6,7 @@
 /*   By: dcelsa <dcelsa@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/04 21:08:37 by dcelsa            #+#    #+#             */
-/*   Updated: 2022/04/11 21:54:27 by dcelsa           ###   ########.fr       */
+/*   Updated: 2022/04/16 14:21:00 by dcelsa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -159,11 +159,12 @@ char					*slash(char *end, char *home);
 int						strvalidator(char *prog, char *cmds);
 int						structindex(t_list *begin, t_list *curcmd);
 char					*symbdefiner(t_bounds *cmd, char *s, t_list *qtxt);
-char					*txtcopy(t_bounds *bounds, t_list **args, t_list *qtxt,
-							t_bool skipqts);
+char					*txtcopy(t_bounds *bounds, t_list **args,
+							t_list *qtxt);
 void					quotedtxt(char *cmd, char *prog, t_list **qtxt,
 							t_bool vldmod);
 void					wildcardhndlr(char *crsr, t_head *head, t_list **exps,
 							t_list *qtxt);
+void					writecdpath(t_head *head, t_list *args, int stat_lock);
 
 #endif

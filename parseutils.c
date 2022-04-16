@@ -6,13 +6,13 @@
 /*   By: dcelsa <dcelsa@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/02 16:00:20 by dcelsa            #+#    #+#             */
-/*   Updated: 2022/04/11 21:35:40 by dcelsa           ###   ########.fr       */
+/*   Updated: 2022/04/16 14:32:26 by dcelsa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-char	*txtcopy(t_bounds *bounds, t_list **args, t_list *qtxt, t_bool skipqts)
+char	*txtcopy(t_bounds *bounds, t_list **args, t_list *qtxt)
 {
 	char	*crsr;
 	char	*begin;
@@ -21,15 +21,14 @@ char	*txtcopy(t_bounds *bounds, t_list **args, t_list *qtxt, t_bool skipqts)
 
 	size = bounds->end - bounds->begin + 2;
 	crsr = bounds->begin;
-	while (!skipqts && crsr <= bounds->end)
-		if (*(crsr++) == '"' || *(crsr - 1) == '\'')
+	while (crsr <= bounds->end)
+		if (istoken(crsr++, "\"'") && outqt(crsr - 1, qtxt, FALSE))
 			size--;
 	crsr = malloc(sizeof(*crsr) * size);
 	begin = bounds->begin;
 	i = 0;
 	while (begin <= bounds->end)
-		if (!skipqts || !(istoken(begin, "\"'")
-				&& outqt(begin, qtxt, FALSE) && begin++))
+		if (!(istoken(begin, "\"'") && outqt(begin, qtxt, FALSE) && begin++))
 			crsr[i++] = *(begin++);
 	crsr[i] = '\0';
 	if (!args)

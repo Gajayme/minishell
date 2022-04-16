@@ -6,30 +6,11 @@
 /*   By: dcelsa <dcelsa@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/02 16:01:52 by dcelsa            #+#    #+#             */
-/*   Updated: 2022/04/11 21:56:24 by dcelsa           ###   ########.fr       */
+/*   Updated: 2022/04/16 13:59:01 by dcelsa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
-
-void	writecdpath(t_head *head, t_list *args, int stat_lock)
-{
-	char	*path;
-
-	if (head->fds.envfds)
-		readenv(&head->env, head->path, ft_strjoin(":", head->path),
-			((int *)ft_lstlast(head->fds.envfds)->content)[0]);
-	if (ft_strncmp(args->content, "cd", -1) || stat_lock)
-		return ;
-	if (ft_lstsize(args) > 1)
-		path = args->next->content;
-	else
-		path = findenv("HOME", ft_strlen("HOME"), head, FALSE);
-	ft_putendl_fd(path, head->fds.path[1]);
-	cd(head->prog, path, &head->env);
-	if (ft_lstsize(args) == 1)
-		free(path);
-}
 
 static void	grand_finale(int pidcount, pid_t *pids, t_head *head, t_list *args)
 {
@@ -39,7 +20,7 @@ static void	grand_finale(int pidcount, pid_t *pids, t_head *head, t_list *args)
 	i = -1;
 	while (++i < pidcount)
 		error_handler(head->prog, NULL, waitpid(pids[i],
-			&head->referr, WUNTRACED));
+				&head->referr, WUNTRACED));
 	free(pids);
 	head->issig = WIFSIGNALED(head->referr);
 	num = ft_itoa(head->issig);

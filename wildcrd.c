@@ -6,7 +6,7 @@
 /*   By: dcelsa <dcelsa@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/02 15:52:38 by dcelsa            #+#    #+#             */
-/*   Updated: 2022/04/03 18:29:31 by dcelsa           ###   ########.fr       */
+/*   Updated: 2022/04/16 14:25:31 by dcelsa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,7 +69,7 @@ static void	partbuilder(t_bounds *word, t_list **parts, t_list *qtxt)
 	bounds.end = symbdefiner(word, "*", qtxt);
 	bounds.end -= istoken(bounds.end, "*") + (!*bounds.end);
 	if (*bounds.begin != '*')
-		ft_lstadd_back(parts, ft_lstnew(txtcopy(&bounds, NULL, qtxt, TRUE)));
+		ft_lstadd_back(parts, ft_lstnew(txtcopy(&bounds, NULL, qtxt)));
 	else
 		ft_lstadd_back(parts, ft_lstnew(NULL));
 	bounds.end += istoken(bounds.end + 1, "*") + (!*(bounds.end + 1));

@@ -6,11 +6,30 @@
 /*   By: dcelsa <dcelsa@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/02 16:02:07 by dcelsa            #+#    #+#             */
-/*   Updated: 2022/04/11 20:52:08 by dcelsa           ###   ########.fr       */
+/*   Updated: 2022/04/16 13:58:11 by dcelsa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
+
+void	writecdpath(t_head *head, t_list *args, int stat_lock)
+{
+	char	*path;
+
+	if (head->fds.envfds)
+		readenv(&head->env, head->path, ft_strjoin(":", head->path),
+			((int *)ft_lstlast(head->fds.envfds)->content)[0]);
+	if (ft_strncmp(args->content, "cd", -1) || stat_lock)
+		return ;
+	if (ft_lstsize(args) > 1)
+		path = args->next->content;
+	else
+		path = findenv("HOME", ft_strlen("HOME"), head, FALSE);
+	ft_putendl_fd(path, head->fds.path[1]);
+	cd(head->prog, path, &head->env);
+	if (ft_lstsize(args) == 1)
+		free(path);
+}
 
 char	**cmdarr(t_list *args)
 {

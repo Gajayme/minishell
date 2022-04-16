@@ -6,7 +6,7 @@
 /*   By: dcelsa <dcelsa@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/02 15:59:23 by dcelsa            #+#    #+#             */
-/*   Updated: 2022/04/11 21:36:25 by dcelsa           ###   ########.fr       */
+/*   Updated: 2022/04/16 14:25:11 by dcelsa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,7 +63,7 @@ static char	*specialhndlr(t_bounds *dlr, t_head *head)
 
 	new.begin = expandspecialsigns(dlr->begin, head, &qtxt);
 	new.end = new.begin + ft_strlen(new.begin) - 1;
-	new.end = txtcopy(&new, NULL, qtxt, TRUE);
+	new.end = txtcopy(&new, NULL, qtxt);
 	free(new.begin);
 	new.begin = new.end;
 	new.end = dlr->begin;

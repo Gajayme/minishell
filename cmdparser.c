@@ -6,7 +6,7 @@
 /*   By: dcelsa <dcelsa@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/02 15:59:47 by dcelsa            #+#    #+#             */
-/*   Updated: 2022/04/11 20:48:14 by dcelsa           ###   ########.fr       */
+/*   Updated: 2022/04/16 14:26:30 by dcelsa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,7 @@ static void	redirdefiner(t_bounds *cmd, t_list **redirs, t_list *qtxt)
 	rdr.end = cmd->end;
 	rdr.end = symbdefiner(&rdr, "<> |&", qtxt);
 	rdr.end -= istoken(rdr.end, "<> |&");
-	(rdrcast(ft_lstlast(*redirs))->florlmt) = txtcopy(&rdr, NULL, qtxt, TRUE);
+	(rdrcast(ft_lstlast(*redirs))->florlmt) = txtcopy(&rdr, NULL, qtxt);
 	rdr.begin = rdr.end + 1;
 	rdr.end = cmd->end;
 	if (rdr.begin >= rdr.end)
@@ -61,7 +61,7 @@ static void	cmdbuilder(t_bounds *cmd, t_cmd *curcmd, t_list *qtxt)
 		cmd->begin = word.end + 1;
 		if (wastoken || (word.end - word.begin < 1 && *word.end == ' '))
 			continue ;
-		txtcopy(&word, &curcmd->args, qtxt, FALSE);
+		txtcopy(&word, &curcmd->args, NULL);
 	}
 }
 
