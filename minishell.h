@@ -6,7 +6,7 @@
 /*   By: dcelsa <dcelsa@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/04 21:08:37 by dcelsa            #+#    #+#             */
-/*   Updated: 2022/04/16 14:21:00 by dcelsa           ###   ########.fr       */
+/*   Updated: 2022/04/17 14:29:06 by dcelsa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,7 +50,6 @@
 #  define SIG 0
 # endif
 
-extern int				errno;
 extern char				**environ;
 extern void				rl_replace_line(const char *a, int b);
 
